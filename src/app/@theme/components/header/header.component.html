@@ -1,0 +1,35 @@
+<div class="header-container">
+  <a href="#" class="sidebar-toggle" matRipple [matRippleUnbounded]="true" [matRippleCentered]="true"
+    (click)="toggleSidebar()">
+    <nb-icon [icon]="(materialTheme$ | async) ? 'menu-outline' : 'menu-2-outline'"></nb-icon>
+  </a>
+  <img src="../../../../assets/images/BaoGao_Logo/Logo_50x50.png" alt="一張圖片" style="margin-left: 2px" />
+  <div class="logo-container">
+    <a (click)="navigateHome()" style="padding: 0px; font-size: 28px">
+      <span i18n="@@platformShort" class="control-item">智慧共桿管理平台</span>
+    </a>
+  </div>
+</div>
+<div id="clock" class="d-none d-lg-block">
+  {{ date | date: "ZZZZ YY-MM-dd a hh:mm:ss" }}
+</div>
+
+<div class="header-container">
+
+  <nb-select class="mx-5" placeholder="Select Showcase" [(selected)]="currentLang" (selectedChange)="changeLang()">
+    <nb-option i18n="@@zh-Hant" value="zh-Hant">中文</nb-option>
+    <nb-option i18n="@@en-US" value="en-US">英文</nb-option>
+  </nb-select>
+
+  <!-- Change Theme (Switcher) Start -->
+  <theme-switcher></theme-switcher>
+  <!-- Change Theme (Switcher) End -->
+
+  <button nbButton (click)="toggleFullScreen()" class="ml-4 lr-3" size="large" ghost>
+    <nb-icon icon="expand-outline"></nb-icon>
+  </button>
+
+  <button nbButton ghost [nbContextMenu]="userMenu" style="margin-left: 10px;">
+    {{accessTypes[accessType]}}
+  </button>
+</div>

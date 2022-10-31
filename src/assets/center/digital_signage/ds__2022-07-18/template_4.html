@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+
+	<!--<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />-->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Digital Signage</title>
+	 <!-- Favicons -->
+	<!--<link rel="shortcut icon" href="#"/>-->
+
+    <base href="../">  <!-- remove this at real server -->
+
+	<script type="text/javascript" src="/js/url_parse.js"></script>
+
+
+
+<style type="text/css">
+* {
+  margin: 0;
+}
+
+/* background-color: #CBF5D1; */
+body, html {
+  color: white;
+  background-color: #000000;
+
+  height: 100%;
+  margin:0;
+  padding:0;
+}
+
+.body > * {
+  padding: 0px;
+}
+/*
+      #header {
+        position:fixed;
+        width:100%; height:12%;
+        top:0; right:0; bottom:auto; left:0;
+  		background: #6BB7A4;
+  	    margin:0;
+		padding:0;
+      }
+*/
+/*   		background: #CBF5D1; */
+      #main {
+        position:fixed;
+        //width:auto; height : auto;
+        width:100%; height : 83%;
+        top:12%; right : 0; bottom : 100px; left : 0;
+  		background: #000000;
+  	    margin:0;
+		padding:0;
+      }
+
+
+/*   		background: #0081b4; */
+      #footer {
+        position:fixed;
+        //width:100%; height:100px;
+        width:100%; height:5%;
+        top:95%; right:0; bottom:0; left:0;
+  		background: #000000;
+  	    margin:0;
+		padding:0;
+      }
+
+
+	.mySlides img {
+		width:100%;
+		height:100%;
+	}
+
+
+
+/* CSS style to hide cursor element */
+//.nocursor {
+//	cursor: none;
+//}
+
+
+
+
+
+
+</style>
+
+<!--<script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui.js"></script>
+-->
+<script src="/js/mqtt.min.js"></script>
+<script src="/js/jquery-3.4.1.min.js" ></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js" ></script>
+<script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript">
+
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+
+
+</script>
+</head>
+<body>
+<!--
+  <div id="header">
+    <a class="weatherwidget-io" style="height: 100%;width: 100%;object-fit: contain;" href="https://forecast7.com/zh-tw/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN" data-label_2="WEATHER" data-font="微軟正黑體 (Microsoft JhengHei)" data-theme="hexellence" >TAOYUAN WEATHER</a>
+  </div>
+-->
+  <div id="main">
+    <!--<video id="video"  controls loop  muted="true" style="max-width:50%;">-->   <!-- id autoplay must set muted="true"-->
+		<video id="video" style="height: 100%;width: 100%;">
+		  <! --<source src="/media/test2.mp4" type="video/mp4"> -->
+		</video>
+
+
+		<img id="image" src="images/bg_2741.jpg" alt="photo"  style="height: 100%;width: 100%;">
+
+  </div>
+  <div id="footer">
+    <!--<marquee direction="right" scrollamount="5" behavior="alternate">跑馬燈資訊</marquee>-->
+    <marquee id="marquee" direction="left" scrollamount="5" behavior="scroll" style="height: 100%;width: 100%;object-fit: contain;"><h1><span id="debug_info">.</span></h1></marquee>
+  </div>
+
+
+
+
+<script type="text/javascript">
+var  WEATHER_WIDGET_HEIGHT = 92;
+var screen_h = 1440;
+var first_time = 1;
+
+var play_mode = "center";
+
+
+var img_play_time = 5000; // default
+
+//var queryTimer = null;
+
+var current_media = {"media_type":"img","src":"first"};
+
+/*
+var mList = [{"media_type":"img","src":"images/bg_2741_resize.jpg"},
+             {"media_type":"img","src":"images/bg.jpg"},
+//             {"media_type":"img","src":"images/bg.png"},
+             {"media_type":"vdo","src":"media/propaganda1.mp4"},
+             {"media_type":"vdo","src":"media/propaganda2.mp4"},
+            ];
+
+var mLen = mList.length; // 播放列表的長度
+*/
+	  var g_url_domain;
+	  var g_url_display;
+	  var g_url_imgtime;
+	  var g_url_filename;
+	  var g_is_preview;
+	  //var g_preview_profile;
+/*
+	function update_test_cnt()
+	{
+		var strTestCnt = localStorage.getItem("digital_signage_test_cnt");
+
+		if((strTestCnt == null) ||
+		   (strTestCnt == ''))
+		{
+			var nTestCnt = 0;
+			localStorage.setItem("digital_signage_test_cnt", 0);
+		}
+		else
+		{
+			var nTestCnt = parseInt(strTestCnt , 10);
+			nTestCnt++;
+
+			localStorage.setItem("digital_signage_test_cnt", nTestCnt);
+		}
+		return nTestCnt;
+	}
+*/
+
+	  function doUpdate(file_info) {
+//"file":"resource/751b5914-33ff-4674-bc82-98ddd39d7e59.png"}
+
+
+		var filename = file_info.file;
+		var file_type =	filename.substr(filename.length - 3);
+
+		file_type = file_type.toLowerCase();
+
+		if((file_type == "jpg") ||
+		   (file_type == "png"))
+		{
+			current_media.media_type = "img";
+		}
+		else
+		{
+			current_media.media_type = "vdo";
+		}
+
+		current_media.src = file_info.file;
+
+		window.sessionStorage['MainMediaType'] = current_media.media_type;
+		window.sessionStorage['MainMediaSrc'] = current_media.src;
+
+		play_next_media();
+	  }
+
+
+  function getNewFile(source) {
+    var new_file = {};
+
+//{"id":"default", "profile":"normal", "source":"main", "file":"first"}'
+
+	if(play_mode == "center")
+	{
+    	new_file.id = g_url_display;
+    }
+    new_file.source = source;
+		new_file.file = current_media.src;
+		//if (g_is_preview == true)
+		//  new_file.profile = g_preview_profile;
+
+		return new_file;
+  }
+
+	function doUpdateContainerMain()
+	{
+		doQueryFile("main");
+	}
+
+
+	function doQueryFile(container) {
+    	var cgi_url;
+		//doUpdate();
+		console.log("doQueryFile");
+
+		var new_file = getNewFile(container);
+
+
+		if(play_mode == "center")
+		{
+			cgi_url = '/cgi-center/display/'+g_url_domain;
+		}
+		else
+		{
+			cgi_url = '/cgi-device/display/'+g_url_domain;
+		}
+
+	// // get digital_signage_template_type from server
+			$.ajax({
+			  method: 'POST',
+			  //url: '/control/signage-content/'+g_url_domain,
+//			  url: '/cgi-center/display/'+g_url_domain,
+			  //url: '/cgi-device/display/'+g_url_domain,
+			  url: cgi_url,
+			  cache: false,
+			  data: JSON.stringify(new_file),
+			  contentType: 'application/json',
+			  dataType: 'json',
+			  beforeSend: function(xhr) {
+			  },
+			  success: function(json, textStatus, jqXHR) {
+//				var target_item;
+//				g_domains = json;
+                // {"page":"green","interval":5}
+
+				doUpdate(json);
+
+	// ----------------------
+			  },
+			  error: function(jqXHR, textStatus, errorThrown) {
+			  	console.log("doQueryFile fail:" +jqXHR.status);
+			  },
+			  complete: function(result) {
+
+				if(first_time)
+				{
+					first_time = 0;
+					doQueryMarquee();
+				}
+			  }
+			});
+	}
+
+  function getNewMarquee(source) {
+    var new_marquee = {};
+
+	if(play_mode == "center")
+	{
+    	new_marquee.id = g_url_display;
+    }
+
+    new_marquee.source = source;
+    new_marquee.text = "";
+    //if (g_is_preview == true)
+    //  new_marquee.profile = g_preview_profile;
+
+    return new_marquee;
+  }
+
+	function doQueryMarquee() {
+		var cgi_url;
+		//doUpdate();
+
+		console.log("doQueryMarquee");
+
+		var new_marquee = getNewMarquee("marqueetext");
+
+		if(play_mode == "center")
+		{
+			cgi_url = '/cgi-center/display/'+g_url_domain;
+		}
+		else
+		{
+			cgi_url = '/cgi-device/display/'+g_url_domain;
+		}
+
+	// // get digital_signage_template_type from server
+			$.ajax({
+			  method: 'POST',
+			  //url: '/control/signage-content/'+g_url_domain,
+//			  url: '/cgi-center/display/'+g_url_domain,
+			  //url: '/cgi-device/display/'+g_url_domain,
+			  url: cgi_url,
+			  cache: false,
+			  data: JSON.stringify(new_marquee),
+			  contentType: 'application/json',
+			  dataType: 'json',
+			  beforeSend: function(xhr) {
+			  },
+			  success: function(json, textStatus, jqXHR) {
+//				var target_item;
+//				g_domains = json;
+                // {"page":"green","interval":5}
+
+				//doUpdate(json);
+
+				if(json)
+				{
+					if(json.text !="")
+					{
+						$("#debug_info").html(json.text);  // span
+						//$("#marquee").css("display","block");
+/*
+						var  header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+
+						//$("#header").css("height","85%");
+						$("#header").css("height",header_height_percent+ "%");
+*/
+                        //$("#main").css("top",header_height_percent+ "%");
+                        $("#main").css("top","0%");
+
+                        //var main_height_percent = 100 - header_height_percent - 5;
+                        var main_height_percent = 100 - 5;
+
+						$("#main").css("height",main_height_percent+ "%");
+
+//						$("#main").css("height","85%");
+						$("#footer").css("display","block");
+					}
+					else
+					{
+						$("#debug_info").html(".");  // span
+						//$("#marquee").css("display","none");
+/*
+						var  header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+
+						//$("#header").css("height","85%");
+						$("#header").css("height",header_height_percent+ "%");
+*/
+                        //$("#main").css("top",header_height_percent+ "%");
+                        $("#main").css("top","0%");
+
+                        //var main_height_percent = 100 - header_height_percent;
+                        var main_height_percent = 100;
+
+						$("#main").css("height",main_height_percent+ "%");
+
+//						$("#main").css("height","89%");
+						$("#footer").css("display","none");
+					}
+				}
+				else
+				{
+					$("#debug_info").html(".");  // span
+					//$("#marquee").css("display","none");
+/*
+						var  header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+
+						//$("#header").css("height","85%");
+						$("#header").css("height",header_height_percent+ "%");
+*/
+                        //$("#main").css("top",header_height_percent+ "%");
+                        $("#main").css("top","0%");
+
+                        //var main_height_percent = 100 - header_height_percent;
+                        var main_height_percent = 100;
+
+						$("#main").css("height",main_height_percent+ "%");
+
+//					$("#main").css("height","89%");
+					$("#footer").css("display","none");
+				}
+
+	// ----------------------
+			  },
+			  error: function(jqXHR, textStatus, errorThrown) {
+				console.log("doQueryMarquee fail:" +jqXHR.status);
+
+
+				// disable marquee
+				$("#debug_info").html(".");  // span
+				//$("#marquee").css("display","none");
+
+/*
+					var  header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+
+					//$("#header").css("height","85%");
+					$("#header").css("height",header_height_percent+ "%");
+*/
+					//$("#main").css("top",header_height_percent+ "%");
+					$("#main").css("top","0%");
+
+					//var main_height_percent = 100 - header_height_percent;
+					var main_height_percent = 100;
+
+					$("#main").css("height",main_height_percent+ "%");
+
+//					$("#main").css("height","89%");
+				$("#footer").css("display","none");
+			  },
+			  complete: function(result) {
+
+			  }
+			});
+	}
+
+
+	  function dochkChangePage(page_info) {
+
+//{"page":"template_4","interval":5, "pause":false}
+		if(page_info.pause)
+		{
+			// show pause??
+			szEntryUrl = '/device/digital_signage/index.html'+'?domain='+g_url_domain +szImgTime;
+			window.location.replace(szEntryUrl);
+		}
+		else
+		{
+			if(page_info.page != "template_4")
+			{
+	//			if(queryTimer)  // clear interval before  window.location.replace(szEntryUrl);
+	//			{
+	//				clearInterval(queryTimer);
+	//			}
+
+				var szEntryUrl = "";
+				var szImgTime ="&imgtime="+(img_play_time/1000);
+
+	//			szEntryUrl = '/digital_signage/'+ page_info.page +'.html'+'?domain='+g_url_domain + '&display='+g_url_display+szImgTime;
+				//szEntryUrl = '/digital_signage/digital_signage/'+ page_info.page +'.html'+'?domain='+g_url_domain + '&display='+g_url_display+szImgTime;
+				//szEntryUrl = '/digital_signage/ds/'+ page_info.page +'.html'+'?domain='+g_url_domain + '&display='+g_url_display+szImgTime;
+				//szEntryUrl = '/device/digital_signage/ds/'+ page_info.page +'.html'+'?domain='+g_url_domain + '&display='+g_url_display+szImgTime;
+				szEntryUrl = '/device/digital_signage/ds/'+ page_info.page +'.html'+'?domain='+g_url_domain +szImgTime;
+
+				window.location.replace(szEntryUrl);
+			}
+			else
+			{
+				if(current_media.media_type == "img")
+				{
+					if(vTimer != null)
+					{
+						clearTimeout(vTimer);
+						vTimer = null;
+					}
+				}
+				else if(current_media.media_type == "vdo")
+				{
+					vobj.pause();
+					vobj.currentTime = 0;
+				}
+
+				first_time = 1; // set to reload page 1 time
+				doUpdateContainerMain();
+			}
+		}
+	  }
+
+
+//  function getNewPage() {
+//    var new_page = {};
+//
+//    new_page.id = g_url_display;
+//
+//    return new_page;
+//  }
+
+/*
+	function doQuery() {  // insteal by function doMqttChkChangePage()
+		//doUpdate();
+
+    if (g_is_preview == true)  return;
+
+		var new_page = getNewPage();
+
+	// // get digital_signage_template_type from server
+			$.ajax({
+			  method: 'POST',
+			  url: '/control/signage-content/'+g_url_domain,
+			  cache: false,
+			  data: JSON.stringify(new_page),
+			  contentType: 'application/json',
+			  dataType: 'json',
+			  beforeSend: function(xhr) {
+			  },
+			  success: function(json, textStatus, jqXHR) {
+//				var target_item;
+//				g_domains = json;
+                // {"page":"green","interval":5}
+
+				//doUpdate(json);
+				dochkChangePage(json);
+	// ----------------------
+			  },
+			  error: function(jqXHR, textStatus, errorThrown) {
+			  }
+			});
+
+	}
+**/
+
+/*
+	const video = document.querySelector('video');
+
+	video.oncanplaythrough = (event) => {
+	  console.log('I think I can play thru the entire ' + 'video without ever having to stop to buffer.');
+	  $("#video").play();
+	};
+*/
+
+
+/*
+//var vList = ['/media/test1.mp4', '/media/test2.mp4', '/media/test2.mp4']; // 初始化播放列表
+var vList = ['media/test1.mp4', 'media/test2.mp4', 'media/test2.mp4']; // 初始化播放列表
+var vLen = vList.length; // 播放列表的長度
+var curr = 0; // 當前播放的視頻
+
+var obj = document.getElementById('video');
+
+obj.addEventListener('ended', function() {
+
+	obj.src = vList[curr];
+	obj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+	obj.play();
+	curr++;
+	if (curr >= vLen)
+	  curr = 0; // 播放完了，重新播放
+});
+
+*/
+
+
+var iobj = document.getElementById('image');
+
+var vobj = document.getElementById('video');
+
+var vTimer = null;
+
+/*
+var curr = 0; // 當前播放的視頻
+
+var now_play_file = null;
+
+var iobj = document.getElementById('image');
+
+var vobj = document.getElementById('video');
+
+
+
+var vTimer = null;
+
+function play_media_before_event()
+{
+	if(now_play_file.media_type == "img")
+	{
+		iobj = document.getElementById('image');
+		iobj.src = now_play_file.src;
+		//iobj.style.width = '80%';
+
+		if(vobj.ended)
+		{
+		}
+		else
+		{
+			vobj.load(); // set video reload ; end video
+		}
+
+		if(iobj.style.display != "block")
+		{
+			iobj.style.display = "block";
+		}
+
+		if(vobj.style.display != "none")
+		{
+			vobj.style.display = "none";
+		}
+
+		vTimer = setTimeout(play_next_media , img_play_time);
+	}
+	else if(now_play_file.media_type == "vdo")
+	{
+		clearTimeout(vTimer);
+		vobj.src = now_play_file.src;
+
+		vobj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+		vobj.play();
+
+		vobj.style.display = "block";
+		iobj.style.display = "none";
+	}
+}
+
+*/
+
+
+function play_next_media()
+{
+	if(current_media.media_type == "img")
+	{
+		iobj = document.getElementById('image');
+		//iobj.src = mList[curr].src;
+		//iobj.src = location.origin + '/' + current_media.src;
+
+//		iobj.src = location.origin + '/resource-center/' + current_media.src;
+		//iobj.src = location.origin + '/resource-device/' + current_media.src;
+
+		if(play_mode == "center")
+		{
+			iobj.src = location.origin + '/resource-center/' + current_media.src;
+		}
+		else
+		{
+			iobj.src = location.origin + '/resource-device/' + current_media.src;
+		}
+
+		//iobj.style.width = '80%';
+
+		if(iobj.style.display != "block")
+		{
+			iobj.style.display = "block";
+		}
+
+		if(vobj.style.display != "none")
+		{
+			vobj.style.display = "none";
+		}
+
+//		now_play_file = mList[curr];
+
+		vTimer = setTimeout(doUpdateContainerMain , img_play_time);
+	}
+	else if(current_media.media_type == "vdo")
+	{
+		clearTimeout(vTimer);
+		//vobj.src = mList[curr].src;
+		//vobj.src = location.origin + '/' + current_media.src;
+//		vobj.src = location.origin + '/resource-center/' + current_media.src;
+		//vobj.src = location.origin + '/resource-device/' + current_media.src;
+
+		if(play_mode == "center")
+		{
+			vobj.src = location.origin + '/resource-center/' + current_media.src;
+		}
+		else
+		{
+			vobj.src = location.origin + '/resource-device/' + current_media.src;
+		}
+
+		vobj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+		vobj.play();
+
+		vobj.style.display = "block";
+		iobj.style.display = "none";
+
+		//now_play_file = mList[curr];
+	}
+
+
+/*
+	if(mList[curr].media_type == "img")
+	{
+		iobj = document.getElementById('image');
+		iobj.src = mList[curr].src;
+		//iobj.style.width = '80%';
+
+		if(iobj.style.display != "block")
+		{
+			iobj.style.display = "block";
+		}
+
+		if(vobj.style.display != "none")
+		{
+			vobj.style.display = "none";
+		}
+
+		now_play_file = mList[curr];
+
+		vTimer = setTimeout(play_next_media , img_play_time);
+	}
+	else if(mList[curr].media_type == "vdo")
+	{
+		clearTimeout(vTimer);
+		vobj.src = mList[curr].src;
+
+		vobj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+		vobj.play();
+
+		vobj.style.display = "block";
+		iobj.style.display = "none";
+
+		now_play_file = mList[curr];
+	}
+
+	curr++;
+	if (curr >= mLen)
+	  curr = 0; // 播放完了，重新播放
+*/
+}
+
+/*
+	function doUpdateContent() {
+	// get digital_signage_template_type from server
+			$.ajax({
+			  method: 'GET',
+			  url: '/control/domain',
+			  cache: false,
+			  contentType: 'application/json',
+			  dataType: 'json',
+			  beforeSend: function(xhr) {
+			  },
+			  success: function(json, textStatus, jqXHR) {
+//				var target_item;
+//				g_domains = json;
+
+
+				// update content
+//var mList = [{"media_type":"img","src":"images/bg_2741_resize.jpg"},
+//             {"media_type":"img","src":"images/bg.png"},
+//             {"media_type":"vdo","src":"media/test1.mp4"},
+//             {"media_type":"vdo","src":"media/test2.mp4"},
+//            ];
+
+				mLen = mList.length; // recnt list length
+
+	// ----------------------
+			  },
+			  error: function(jqXHR, textStatus, errorThrown) {
+			  }
+			});
+
+	}
+*/
+
+vobj.addEventListener('ended', function() {
+	doUpdateContainerMain();
+/*
+	vobj.src = mList[curr].src;
+
+	now_play_file = vobj.src;
+
+	vobj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+	vobj.play();
+	curr++;
+	if (curr >= mLen)
+	  curr = 0; // 播放完了，重新播放
+*/
+});
+
+
+/*
+	function loadNewVideo() {
+
+		clearTimeout(vTimer);
+		vobj.src = 'media/event.mp4';
+		vobj.load(); // 如果短的話，可以加載完成之後再播放，監聽 canplaythrough 事件即可
+		vobj.play();
+
+		//evobj.style.display = "none";
+		vobj.style.display = "block";
+		iobj.style.display = "none";
+	}
+
+
+	function loadVideoBeforeEvent() {
+		play_media_before_event();
+	}
+*/
+
+	function doMqttChkChangePage()
+	{
+	  var host = window.location.host;
+	  //var url = 'wss://' + host + '/mqtt';   //   wss is ok at https , but ws is not ok at https // the server must open wss
+	  var url = 'ws://' + host + '/mqtt';   //   ws is ok at http , our project is run at local , so http is enough .
+
+	  let options = {
+		  clean: true,
+		  keepalive: 30,
+	  //  username: 'rw',
+	  //  password: 'readwrite',
+	  //  reconnectPeriod: 0,
+	  //  rejectUnauthorized: false
+	  }
+	  var client = mqtt.connect(
+		url,
+		options
+	  );
+
+	  /*
+		test command
+		mosquitto_pub -p 1886 -t 'apexx/control/mediaPlayer' -m '{"page":"template_4","interval":5, "pause":false}'
+	  */
+	  client.on('connect', () => {
+		console.log('connected.');
+		client.subscribe("apexx/control/mediaPlayer")
+		client.on("message", function (topic, payload) {
+		  //console.log(payload);
+		  console.log([topic, payload].join(": "));
+		  //client.end()
+		  var jPaylod = JSON.parse(payload);
+
+		  dochkChangePage(jPaylod);
+		});
+	  });
+	}
+
+	$(document).ready(function() {
+
+		// filename
+		var url = window.location.pathname;
+		//	console.log(decodeURIComponent(window.location.pathname));
+
+		g_url_filename = url.substring(url.lastIndexOf('/')+1);
+		//console.log(g_url_filename);
+
+		// parameter
+		/*
+			var url_param =  queryString();
+			//console.log();
+
+			//console.log(decodeURIComponent(url_param.domain),decodeURIComponent(url_param.display));
+
+			g_url_domain = decodeURIComponent(url_param.domain);
+			g_url_display = decodeURIComponent(url_param.display);
+			console.log(g_url_filename , g_url_domain , g_url_display);
+		*/
+
+		//
+		var urlParams = new URLSearchParams(window.location.search);
+
+
+		console.log(window.location.pathname);
+
+		if(window.location.pathname.includes("center"))
+		{
+			console.log("IN center");
+			play_mode = "center";
+		}
+		else
+		{
+			console.log("Not IN center");
+			play_mode = "device";
+
+			if((window.sessionStorage['MainMediaType'] != undefined) &&
+			   (window.sessionStorage['MainMediaSrc'] != undefined)
+			  )
+			{
+				current_media.media_type = window.sessionStorage['MainMediaType'];
+				current_media.src = window.sessionStorage['MainMediaSrc'];
+			}
+		}
+
+
+		g_url_domain = urlParams.get('domain');
+
+		if(play_mode == "center")
+		{
+			g_url_display = urlParams.get('preview');
+		}
+
+		g_url_imgtime = urlParams.get('imgtime');
+	    g_is_preview = urlParams.has('preview');
+		//if (g_is_preview == true)
+		//  g_url_display = urlParams.get('preview');
+
+		if(g_url_imgtime != null)
+		{
+			var img_time_tmp = parseInt(g_url_imgtime , 10);
+			if((img_time_tmp > 0) && (img_time_tmp < 86400))  // sec ; max is 1 days
+			{
+				img_play_time =  img_time_tmp * 1000;  // msec
+			}
+		}
+
+		//console.log(g_url_filename , g_url_domain , g_url_display);   // debug , print  url filename , doamin , display
+
+		//
+		//doUpdate();
+		//doQuery();
+
+		//play_next_media();
+		doUpdateContainerMain();
+
+ 		//queryTimer = setInterval(doQuery, 1000); // doQuery per sec
+
+		if(window.location.pathname.includes("center"))
+		{
+		}
+		else
+		{
+			doMqttChkChangePage(); // only do Mqtt at device
+		}
+
+		// ----------------------------------------
+		//$('body').css('background-image', 'url(' + '/images/bg_2741.jpg' + ')'); // bg from jsig
+		//		$('body').css('background-image', 'url(' + 'images/bg_2741.jpg' + ')'); // bg from jsig
+		// -------------------------------------------
+
+		//$('wrapper').css('cursor', 'none');
+
+
+
+//		vobj.addEventListener('loadedmetadata', function() {
+//			alert(vobj.videoWidth +','+ vobj.videoHeight);
+//		});
+
+		//vobj.style.object-fit ="fill";
+		//vobj.style.object-fit ="contain";
+
+		var w = window.innerWidth
+		|| document.documentElement.clientWidth
+		|| document.body.clientWidth;
+
+		var h = window.innerHeight
+		|| document.documentElement.clientHeight
+		|| document.body.clientHeight;
+
+
+        screen_h = h;
+/*
+
+		vobj.style.width = (w-15)+"px";
+		//vobj.style.height = (h-114)+"px"; // ok
+		vobj.style.height = (h-99)+"px";
+		//vobj.style.height = (h-80)+"px";
+
+
+		iobj.style.width = (w-15)+"px";
+		//iobj.style.height = (h-114)+"px";
+		iobj.style.height = (h-99)+"px";
+
+
+*/
+
+// -------------------------------------------------------------------------------
+
+//1440,900
+// 1366,768
+		console.log("window.inner",window.innerWidth,window.innerHeight);                       //960,600
+		console.log("clientWidth",document.documentElement.clientWidth,document.documentElement.clientHeight); // 949,589
+		console.log("body.clientWidth",document.body.clientWidth,document.body.clientHeight);
+		console.log("w/h",w,h);
+
+console.log("window.screen",window.screen.width,window.screen.height); // 1440,900
+console.log("window.screen.avail",window.screen.availWidth,window.screen.availHeight);
+
+console.log("document.body.client",document.body.clientWidth,document.body.clientHeight);
+console.log("document.body.scroll",document.body.scrollWidth,document.body.scrollHeight);
+/*
+
+var wobj = document.getElementById('marquee');
+console.log("wobj",wobj.scrollWidth,wobj.scrollHeight);  // marquee : 32 ??
+
+
+console.log("$window",$(window).width(),$(window).height());  // 949,589
+*/
+
+// -------------------------------------------------------------------------------
+
+
+
+
+//alert(w+','+ h); // 960 // 600
+
+//		$("#video").width(w-15);
+//        $("#video").height(h-80);
+
+
+//		$("#image").width(w-15);
+//        $("#image").height(h-80);
+
+
+		//vobj.style.width = "100vw";
+		//vobj.style.height = "100vh";
+
+		//iobj.style.width = "80%";
+		//iobj.style.object-fit ="fill";
+
+		// iobj.style.height = "20vh";
+
+		//$("#marquee").css("display","none");
+		//$("#marquee").css("display","block");
+
+	});
+
+//alert($("#weatherwidget").height()+','+ $("main").height()+','+$("footer").height());
+
+
+
+
+
+
+  $(window).on('resize', function(){
+/*
+    if(screen.width === window.innerWidth){
+      // this is full screen
+	  console.log("full screen");
+    }
+    else
+    {
+	  console.log("not full screen");
+    }
+*/
+    location.reload(); // reload at resize // maybe change full screen mode
+  });
+
+</script>
+
+</body>
+</html>

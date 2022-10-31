@@ -1,0 +1,64 @@
+{
+  "safe": {
+    "connection": {
+      "smart-light": "icon green-04.svg",
+      "media": "icon green-05.svg",
+      "env-sensor": "icon green-06.svg"
+    },
+    "smart-light": {
+      "volt": "icon green-15.svg",
+      "current": "icon green-17.svg",
+      "brightness": "icon green-16.svg",
+      "power-consumption": "icon green-18.svg"
+    },
+    "env-sensor": {
+      "temperature": "icon green-07.svg",
+      "humidity": "icon green-08.svg",
+      "pm2.5": "icon green-09.svg",
+      "pm10": "icon green-10.svg",
+      "o3": "icon green-11.svg",
+      "co": "icon green-12.svg",
+      "no2": "icon green-13.svg",
+      "so2": "icon green-14.svg"
+    },
+    "save-energy": {
+      "volt-charge": "icon green-19.svg",
+      "current-charge": "icon green-21.svg",
+      "volt-discharge": "icon green-20.svg",
+      "current-discharge": "icon green-22.svg",
+      "battery": "icon green-23.svg",
+      "temperature": "icon green-07.svg"
+    }
+  },
+  "warning": {
+    "connection": {
+      "smart-light": "icon red-04.svg",
+      "media": "icon red-05.svg",
+      "env-sensor": "icon red-06.svg"
+    },
+    "smart-light": {
+      "volt": "icon red-15.svg",
+      "current": "icon red-17.svg",
+      "brightness": "icon red-16.svg",
+      "power-consumption": "icon red-18.svg"
+    },
+    "env-sensor": {
+      "temperature": "icon red-07.svg",
+      "humidity": "icon red-08.svg",
+      "pm2.5": "icon red-09.svg",
+      "pm10": "icon red-10.svg",
+      "o3": "icon red-11.svg",
+      "co": "icon red-12.svg",
+      "no2": "icon red-13.svg",
+      "so2": "icon red-14.svg"
+    },
+    "save-energy": {
+      "volt-charge": "icon red-19.svg",
+      "current-charge": "icon red-21.svg",
+      "volt-discharge": "icon red-20.svg",
+      "current-discharge": "icon red-22.svg",
+      "battery": "icon red-23.svg",
+      "temperature": "icon red-07.svg"
+    }
+  }
+}

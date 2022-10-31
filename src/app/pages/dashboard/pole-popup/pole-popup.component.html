@@ -1,0 +1,207 @@
+<nb-card>
+  <nb-card-header class="title">{{ poleData.number }}</nb-card-header>
+  <nb-card-body style="overflow-x: hidden">
+    <div id="sitebody">
+      <div *ngIf="poleData.light_show" class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+            checkLightState()
+            ? iconRoot + ICON['safe']['connection']['smart-light']
+            : iconRoot + ICON['warning']['connection']['smart-light']
+            }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@connectStatus">連線狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ translateLightState() }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@brightness">亮度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.light_show === "online" ? poleData.b + " %" : GLOBAL_SETTINGS.noData}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="poleData.environment_show" class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+              poleData.environment_show === 'online'
+              ? iconRoot + ICON['safe']['connection']['env-sensor']
+              : iconRoot + ICON['warning']['connection']['env-sensor']
+            }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@connectStatus">連線狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.environment_show }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@wireStatus">線路狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{poleData.environment_connect }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@temperature">溫度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.t }} °C
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@humidity">濕度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.rh }} %
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="poleData.player_show" class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+              poleData.player_show === 'online'
+              ? iconRoot + ICON['safe']['connection']['media']
+              : iconRoot + ICON['warning']['connection']['media']
+            }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@connectStatus">連線狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.player_show }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@wireStatus">線路狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.player_connect }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="poleData.solar_show" class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+              poleData.solar_show === 'online'
+                ? iconRoot + ICON['safe']['connection']['solar']
+                : iconRoot + ICON['warning']['connection']['solar']
+            }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@connectStatus">連線狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.solar_show }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@wireStatus">線路狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.solar_connect }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="batteryTemp @@bt">電池溫度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.bt }} °C
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@bc">電量</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.bc }} %
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="poleData.holder_show" class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+          poleData.holder_show === 'online'
+            ? iconRoot + ICON['safe']['connection']['holder']
+            : iconRoot + ICON['warning']['connection']['holder'] }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@connectStatus">連線狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.holder_show }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@wireStatus">線路狀態</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.holder_connect }}
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="@@hd">箱門狀態</div>
+            <span i18n="@@switch" style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">{{ poleData.hd }}</span>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="holderTemp @@ht">箱內溫度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.ht }} °C
+            </div>
+          </div>
+        </div>
+        <div id="content">
+          <div class="row">
+            <div i18n="holderHumidity @@hh">箱內濕度</div>
+            <div style="color: #3366ff; margin-left: 1rem; text-shadow: 10px">
+              {{ poleData.hh }} %
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border_line">
+        <div id="sidebar_left">
+          <img src="{{
+            iconRoot + ICON['safe']['connection']['media']
+            }}" class="icon" />
+        </div>
+        <div id="content">
+          <div class="row">
+            <img [src]="cctvList[poleData.number]" style="height: 25%; width: 100%;">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </nb-card-body>
+
+  <nb-card-footer style="text-align: center">
+    <button nbButton matRipple i18n="@@NavDetail" shape="semi-round" size="tiny" (click)="showDetail()" class="button">
+      前往智慧桿細項頁面
+    </button>
+  </nb-card-footer>
+</nb-card>

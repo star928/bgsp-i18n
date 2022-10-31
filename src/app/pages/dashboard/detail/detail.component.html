@@ -1,0 +1,169 @@
+<!-- First Row Line -->
+<!--
+  總覽
+  連線狀態
+  告警事項
+-->
+<div *ngIf="poleData">
+  <div class="row">
+    <div class="col-xxl-4 col-lg-6 px-2">
+      <nb-card size="tiny">
+        <nb-card-header> 總 覽 </nb-card-header>
+
+        <nb-card-body>
+          <div class="row d-flex">
+            <div class="col-6">
+              <div class="row justify-content-end">
+                <div>
+                  <img src="https://cdn.discordapp.com/attachments/932508706124484648/957864631542632448/unknown.png"
+                    class="photo" id="overviewPhoto" alt="SmartPole" />
+                </div>
+                <div>
+                  <button nbButton class="mx-2" ghost size="large" status="info" (click)="maximizePhoto(dialog)">
+                    <nb-icon icon="maximize-outline"></nb-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div style="
+                  position: relative;
+                  top: 12%;
+                  padding-left: 17%;
+                  text-align: left;
+                  line-height: 110%;
+                ">
+                <span><span i18n="@@poleNumbewr">編號</span>: {{ poleData.number }}</span><br />
+                <span><span i18n="@@latitude">緯度</span>: {{ poleData.geoLocation["lat"] }}</span><br />
+                <span><span i18n="@@longitude">經度</span>: {{ poleData.geoLocation["lng"] }}</span><br /><br />
+                <span i18n="@@holder">箱體狀態</span><br />
+                <span><span i18n="@@holderConnect">箱體連線</span>:
+                  {{ poleData.holder_show }}</span><br />
+                <span i18n="@@hd">箱門狀態</span>: <span i18n="@@switch">{poleData.hd, select, open {開啟} close
+                  {關閉}}</span><br />
+                <span><span i18n="holderTemperature @@ht">箱內溫度</span>: {{ poleData.ht }}
+                  <span i18n="@@temperatureUnit">°C</span></span><br />
+                <span><span i18n="holderHumidity @@hh">箱內濕度</span>: {{ poleData.hh }} %</span>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-xxl-4 col-lg-6 px-2">
+      <nb-card size="tiny">
+        <nb-card-header i18n="@@connectStatusWithSpace">連 線 狀 態</nb-card-header>
+        <nb-card-body>
+          <div class="d-flex justify-content-around flex-wrap">
+            <div class="mt-4" *ngFor="let connectState of connectStates">
+              {{ connectState.name }}
+              <br />
+              <img src="{{ connectState.iconPath }}" class="icon_size" alt="Iot GW" />
+              <br />
+              {{ connectState.state }}
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-xxl-4 col-lg-12 mb-1 px-2" style="height: 214px">
+      <div leaflet [leafletOptions]="mapOptions" (leafletMapReady)="onMapReady($event)" style="border-radius: 3px">
+      </div>
+    </div>
+  </div>
+  <!-- End -->
+
+  <!-- Second Row -->
+  <!--
+  智慧照明
+  地圖
+  環境感測
+-->
+
+  <div class="row">
+    <div class="col-xxl-2 col-xl-2 px-2 pt-1">
+      <nb-card size="small">
+        <nb-card-header i18n="@@smartLightWithSpace">智 慧 照 明</nb-card-header>
+        <nb-card-body>
+          <div class="d-flex justify-content-around flex-wrap">
+            <div class="col-6 mt-4 p-0" *ngFor="let smartLight of smartLights">
+              {{ smartLight.name }}
+              <br />
+              <img src="{{ smartLight.iconPath }}" class="icon_size" alt="Iot GW" />
+              <br />
+              {{ smartLight.state }}
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-xxl-5 col-xl-5 px-2 pt-1">
+      <nb-card size="small">
+        <nb-card-header i18n="@@environmentWithSpace">環 境 感 測</nb-card-header>
+        <nb-card-body>
+          <div class="d-flex justify-content-around flex-wrap">
+            <div class="col-3 mt-4 p-0" *ngFor="let envSensor of envSensors">
+              {{ envSensor.name }}
+              <br />
+              <img src="{{ envSensor.iconPath }}" class="icon_size" alt="Iot GW" />
+              <br />
+              {{ envSensor.state }}
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-xxl-5 col-xl-5 px-2 pt-1">
+      <nb-card size="small">
+        <nb-card-header i18n="@@solarWithSpace">儲 能 系 統</nb-card-header>
+        <nb-card-body>
+          <div class="d-flex justify-content-around flex-wrap">
+            <div class="col-3 mt-4 p-0" *ngFor="let saveEnergy of saveEnergys">
+              {{ saveEnergy.name }}
+              <br />
+              <img src="{{ saveEnergy.iconPath }}" class="icon_size" alt="Iot GW" />
+              <br />
+              {{ saveEnergy.state }}
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+  <!-- End -->
+
+  <!-- Third Row -->
+  <!--
+  儲能系統
+  訊息發佈
+-->
+
+  <div class="row">
+    <div class="col-md-12 px-2">
+      <nb-card size="tiny" id="warningTable">
+        <nb-card-header i18n="@@alarmWithSpace">告 警 事 項</nb-card-header>
+        <nb-card-body>
+          <ng2-smart-table [settings]="settings" [source]="source">
+          </ng2-smart-table>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>
+
+<div i18n="@@poleNotFound" *ngIf="notFound">找不到名稱為 {{ smartPoleId }} 的智慧桿資料</div>
+<!-- End -->
+
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header i18n="@@smartPole">智慧桿</nb-card-header>
+    <nb-card-body>
+      <img src="https://cdn.discordapp.com/attachments/932508706124484648/957864631542632448/unknown.png"
+        alt="SmartPole" style="width: auto; height: 80vh" />
+    </nb-card-body>
+  </nb-card>
+</ng-template>

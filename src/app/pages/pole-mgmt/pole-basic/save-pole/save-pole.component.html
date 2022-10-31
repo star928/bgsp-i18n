@@ -1,0 +1,320 @@
+<!-- Visible only on xl -->
+<div class="d-none d-xl-block">
+  <nb-card size="large">
+
+    <nb-card-header>
+      <div class="row">
+        <div class="col-3"><span>{{type}}</span><span i18n="@@smartPole">智慧桿</span></div>
+        <div class="col-9 d-flex justify-content-end">
+          <nb-icon icon="close-circle-outline" style="transform: scale(1.2); cursor: pointer" (click)="close(false)">
+          </nb-icon>
+        </div>
+      </div>
+    </nb-card-header>
+
+    <nb-card-body>
+      <form [formGroup]="pole">
+        <div i18n="@@smartPole" class="subtitle">智慧桿</div>
+
+        <div class="d-flex align-content-center flex-wrap pt-2">
+          <div class="col-6 my-1">
+            <div class="col-12 align-items-center">
+              <div class="row align-items-center">
+                <span i18n="@@poleNumber">編號</span><span class="required">*</span>
+                <input type="text" nbInput class="mx-4" formControlName="number" placeholder="請輸入編號"
+                  autocomplete="off" />
+              </div>
+              <div class="my-3" formGroupName="geoLocation">
+                <div class="row align-items-center">
+                  <span i18n="@@latitude">緯度</span><span class="required">*</span>
+                  <input type="text" nbInput class="mx-4" formControlName="lat" placeholder="請輸入緯度"
+                    autocomplete="off" />
+                </div>
+                <div class="row align-items-center my-3">
+                  <span i18n="@@longitude">經度</span><span class="required">*</span>
+                  <input type="text" nbInput class="mx-4" formControlName="lng" placeholder="請輸入經度"
+                    autocomplete="off" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div i18n="@@enablePole" class="pb-2">桿體啟用</div>
+
+            <div class="col-6 py-2">
+              <nb-checkbox status="primary" [checked]="poleManageData?.enable ? true : false"
+                (checkedChange)="checkboxChanged($event, 'enable')" [disabled]="type != '新增'"><span
+                  i18n="@@smartPole">智慧桿</span><span class="required">*</span></nb-checkbox>
+            </div>
+
+            <div i18n="@@enableFeature" class="pb-2">功能啟用</div>
+
+            <div *ngIf="poleEnable" class="d-flex align-content-center flex-wrap">
+              <div class="col-6 py-2">
+                <nb-checkbox i18n="@@smartLight" status="primary"
+                  [checked]="poleManageData?.light_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'light_enable')" [disabled]="type != '新增'">智慧照明</nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox status="primary" [checked]="poleManageData?.environment_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'environment_enable')" [disabled]="type != '新增'">
+                  <span i18n="@@environment">環境感測</span>
+                </nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox status="primary" [checked]="poleManageData?.player_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'player_enable')" [disabled]="type != '新增'">
+                  <span i18n="@@mediaPlayer">投放設備</span>
+                </nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox i18n="@@solar" status="primary" [checked]="poleManageData?.solar_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'solar_enable')" [disabled]="type != '新增'">儲能系統</nb-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br />
+
+        <div i18n="@@digitalSignage" class="subtitle">數位看板</div>
+
+        <div class="col-12">
+          <div class="col-12">
+            <div class="row align-items-center">
+              <span *ngIf="!poleManageData?.passwd">
+                <span i18n="@@password">密碼</span><span class="required">*</span>
+                <input nbInput class="mx-4" type="password" formControlName="passwd" i18n="@@inputPasswordHint"
+                  placeholder="請輸入密碼" autocomplete="off" />
+              </span>
+            </div>
+
+            <div class="row align-items-center py-2">
+              <span i18n="@@schedule">排程</span>
+              <nb-select matRipple class="mx-2" formControlName="player_screen">
+                <nb-option matRipple *ngFor="let schedule of schedules" [value]="schedule">{{ schedule }}
+                </nb-option>
+              </nb-select>
+            </div>
+          </div>
+
+          <div *ngIf="playerScreen === 'on'">
+            <div class="py-2 px-0">
+              <ng2-smart-table [settings]="screenScedule_setting" [source]="screenScheduleSource"
+                (deleteConfirm)="deletePlayerSchedule($event)">
+              </ng2-smart-table>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <div i18n="@@selectTime" class="mx-2">選擇時間</div>
+              <nb-select matRipple [(selected)]="week">
+                <nb-option matRipple *ngFor="let week of weeks" [value]="week[1]">{{week[1]}}</nb-option>
+              </nb-select>
+
+              <input class="col-2 ml-3 mr-1" nbInput type="text" [nbTimepicker]="startTime" [value]="startDate"
+                (blur)="setDate(startTime.date, 'startDate')" i18n-placeholder="@@startTimeHint" placeholder="開始時間"
+                autocomplete="off" />
+              <nb-timepicker #startTime (onSelectTime)="setDate($event.time, 'startDate')">
+              </nb-timepicker>
+
+              <input class="col-2 ml-1 mr-2" nbInput type="text" [nbTimepicker]="endTime" [value]="endDate"
+                (blur)="setDate(endTime.date, 'endDate')" i18n-placeholder="@@endTimeHint" placeholder="結束時間"
+                autocomplete="off" />
+              <nb-timepicker #endTime (onSelectTime)="setDate($event.time, 'endDate')"></nb-timepicker>
+              <div i18n="@@style" class="mx-0">樣式</div>
+
+              <nb-select class="col-3 mx-0" matRipple [(selected)]="display">
+                <nb-option matRipple *ngFor="let signage of signages" [value]="signage.id">{{ signage.id }}
+                </nb-option>
+              </nb-select>
+
+              <div class="col-1">
+                <button nbButton i18n="@@add" size="small" status="info" (click)="addPlayerSchedule(startTime, endTime)"
+                  [disabled]="
+                  !week ||
+                  !startTime.date ||
+                  !endTime.date ||
+                  startTime.date >= endTime.date ||
+                  !display
+                ">加入</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 d-flex justify-content-center" style="margin-top: 20px">
+          <button nbButton size="small" status="info" (click)="savePole()" [disabled]="submitted || !pole.valid"
+            [class.btn-pulse]="submitted">
+            <span>{{type}}</span>
+          </button>
+        </div>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>
+
+<!-- Hidden only on xl -->
+
+<div class="d-xl-none">
+  <nb-card size="medium">
+
+    <nb-card-header>
+      <div class="row">
+        <div class="col-3"><span>{{type}}</span><span i18n="@@smartPole">智慧桿</span></div>
+        <div class="col-9 d-flex justify-content-end">
+          <nb-icon icon="close-circle-outline" style="transform: scale(1.2); cursor: pointer" (click)="close(false)">
+          </nb-icon>
+        </div>
+      </div>
+    </nb-card-header>
+
+    <nb-card-body>
+      <form [formGroup]="pole">
+        <div i18n="@@smartPole" class="subtitle">智慧桿</div>
+
+        <div class="d-flex align-content-center flex-wrap pt-2">
+          <div class="col-6 my-1">
+            <div class="col-12 align-items-center">
+              <div class="row align-items-center">
+                <span i18n="@@poleNumber">編號</span><span class="required">*</span>
+                <input type="text" nbInput class="mx-4" formControlName="number" placeholder="請輸入編號"
+                  autocomplete="off" />
+              </div>
+              <div class="my-3" formGroupName="geoLocation">
+                <div class="row align-items-center">
+                  <span i18n="@@latitude">緯度</span><span class="required">*</span>
+                  <input type="text" nbInput class="mx-4" formControlName="lat" placeholder="請輸入緯度"
+                    autocomplete="off" />
+                </div>
+                <div class="row align-items-center my-3">
+                  <span i18n="@@longitude">經度</span><span class="required">*</span>
+                  <input type="text" nbInput class="mx-4" formControlName="lng" placeholder="請輸入經度"
+                    autocomplete="off" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div i18n="@@enablePole" class="pb-2">桿體啟用</div>
+
+            <div class="col-6 py-2">
+              <nb-checkbox status="primary" [checked]="poleManageData?.enable ? true : false"
+                (checkedChange)="checkboxChanged($event, 'enable')" [disabled]="type != '新增'"><span
+                  i18n="@@smartPole">智慧桿</span><span class="required">*</span></nb-checkbox>
+            </div>
+
+            <div i18n="@@enableFeature" class="pb-2">功能啟用</div>
+
+            <div *ngIf="poleEnable" class="d-flex align-content-center flex-wrap">
+              <div class="col-6 py-2">
+                <nb-checkbox i18n="@@smartLight" status="primary"
+                  [checked]="poleManageData?.light_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'light_enable')" [disabled]="type != '新增'">智慧照明</nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox status="primary" [checked]="poleManageData?.environment_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'environment_enable')" [disabled]="type != '新增'">
+                  <span i18n="@@environment">環境感測</span>
+                </nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox status="primary" [checked]="poleManageData?.player_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'player_enable')" [disabled]="type != '新增'">
+                  <span i18n="@@mediaPlayer">投放設備</span>
+                </nb-checkbox>
+              </div>
+
+              <div class="col-6 py-2">
+                <nb-checkbox i18n="@@solar" status="primary" [checked]="poleManageData?.solar_enable ? true : false"
+                  (checkedChange)="checkboxChanged($event, 'solar_enable')" [disabled]="type != '新增'">儲能系統</nb-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <br />
+
+        <div i18n="@@digitalSignage" class="subtitle">數位看板</div>
+
+        <div class="col-12">
+          <div class="col-12">
+            <div class="row align-items-center">
+              <span *ngIf="!poleManageData?.passwd">
+                <span i18n="@@password">密碼</span><span class="required">*</span>
+                <input nbInput class="mx-4" type="password" formControlName="passwd" i18n="@@inputPasswordHint"
+                  placeholder="請輸入密碼" autocomplete="off" />
+              </span>
+            </div>
+
+            <div class="row align-items-center py-2">
+              <span i18n="@@schedule">排程</span>
+              <nb-select matRipple class="mx-2" formControlName="player_screen">
+                <nb-option matRipple *ngFor="let schedule of schedules" [value]="schedule">{{ schedule }}
+                </nb-option>
+              </nb-select>
+            </div>
+          </div>
+
+          <div *ngIf="playerScreen === 'on'">
+            <div class="py-2 px-0">
+              <ng2-smart-table [settings]="screenScedule_setting" [source]="screenScheduleSource"
+                (deleteConfirm)="deletePlayerSchedule($event)">
+              </ng2-smart-table>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <div i18n="@@selectTime" class="mx-2">選擇時間</div>
+              <nb-select matRipple [(selected)]="week">
+                <nb-option matRipple *ngFor="let week of weeks" [value]="week">{{
+                  week
+                  }}</nb-option>
+              </nb-select>
+
+              <input class="col-2 ml-3 mr-1" nbInput type="text" [nbTimepicker]="startTime" [value]="startDate"
+                (blur)="setDate(startTime.date, 'startDate')" i18n-placeholder="@@startTimeHint" placeholder="開始時間"
+                autocomplete="off" />
+              <nb-timepicker #startTime (onSelectTime)="setDate($event.time, 'startDate')">
+              </nb-timepicker>
+
+              <input class="col-2 ml-1 mr-2" nbInput type="text" [nbTimepicker]="endTime" [value]="endDate"
+                (blur)="setDate(endTime.date, 'endDate')" i18n-placeholder="@@endTimeHint" placeholder="結束時間"
+                autocomplete="off" />
+              <nb-timepicker #endTime (onSelectTime)="setDate($event.time, 'endDate')"></nb-timepicker>
+              <div i18n="@@style" class="mx-0">樣式</div>
+
+              <nb-select class="col-3 mx-0" matRipple [(selected)]="display">
+                <nb-option matRipple *ngFor="let signage of signages" [value]="signage.id">{{ signage.id }}
+                </nb-option>
+              </nb-select>
+
+              <div class="col-1 mx-0">
+                <button nbButton i18n="@@add" size="small" status="info" (click)="addPlayerSchedule(startTime, endTime)"
+                  [disabled]="
+                  !week ||
+                  !startTime.date ||
+                  !endTime.date ||
+                  startTime.date >= endTime.date ||
+                  !display
+                ">加入</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 d-flex justify-content-center" style="margin-top: 20px">
+          <button nbButton size="small" status="info" (click)="savePole()" [disabled]="submitted || !pole.valid"
+            [class.btn-pulse]="submitted">
+            <span i18n="@@saveTypeSelector">{type, select, 新增 {新增} 修改 {修改}}</span>
+          </button>
+        </div>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>

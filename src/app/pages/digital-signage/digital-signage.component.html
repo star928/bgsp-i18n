@@ -1,0 +1,145 @@
+<!-- <img src="{{ preview_image }}" width="100%" alt="一張圖片" /> -->
+<div class="col-12" *ngIf="signageList">
+
+  <div class="py-2"></div>
+
+  <div class="col-12 d-flex justify-content-between align-items-center" style="height: 5vh">
+    <button i18n="@@createSignage" *ngIf="isManager" nbButton status="primary" size="medium"
+      (click)="addSignage(dialog)">
+      新增樣式
+    </button>
+    <span i18n="@@totalSignage">共 {{ signageList.length }} 式看版</span>
+  </div>
+
+  <div class="py-2"></div>
+
+  <!-- 未設定版型 Start -->
+  <div *ngIf="signageFilter(signageList).length > 0">
+    <div class="row m-0">
+      <div class="col-3 p-0">
+        <h2 i18n="@@errorSignage">未設定板型</h2>
+      </div>
+      <div class="col-9 d-flex justify-content-end">
+        <div class="row">
+          <button nbButton matRipple status="primary" size="small" (click)="accordionOpenAll(unsetAccordion)">
+            <span i18n="@@showAll">全部展開</span>
+          </button>
+          <div class="mx-2"></div>
+          <button nbButton matRipple status="primary" size="small" (click)="accordionCloseAll(unsetAccordion)">
+            <span i18n="@@hideAll">全部收攏</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nb-accordion multi class="d-flex flex-wrap col-12 my-3" #unsetAccordion>
+      <nb-accordion-item *ngFor="let signage of signageFilter(signageList)" class="col-12 col-sm-5 col-lg-3 m-3">
+        <nb-accordion-item-header>
+          {{ signage.id }}
+        </nb-accordion-item-header>
+        <nb-accordion-item-body>
+          <div class="row">
+            <!-- Button List Start -->
+            <div class="d-flex justify-content-end col-12">
+              <button *ngIf="isManager" i18n-nbTooltip="@@deleteToolTip" nbTooltip="刪除" nbTooltipStatus="primary"
+                nbButton ghost status="danger" (click)="deleteSignage(signage.id)">
+                <nb-icon icon="trash-2-outline"></nb-icon>
+              </button>
+            </div>
+            <!-- Button List End -->
+          </div>
+        </nb-accordion-item-body>
+      </nb-accordion-item>
+    </nb-accordion>
+  </div>
+  <!-- 未設定版型 End -->
+
+  <!-- 樣式 Start -->
+  <div *ngFor="let template of templateList">
+    <div *ngIf="signageFilter(signageList, template).length > 0">
+      <div class="row m-0">
+        <div class="col-3 p-0">
+          <h2>{{ template }}</h2>
+        </div>
+        <div class="col-9 d-flex justify-content-end">
+          <div class="row">
+            <button nbButton matRipple status="primary" size="small" (click)="accordionOpenAll(unsetAccordion)">
+              <span i18n="@@showAll">全部展開</span>
+            </button>
+            <div class="mx-2"></div>
+            <button nbButton matRipple status="primary" size="small" (click)="accordionCloseAll(unsetAccordion)">
+              <span i18n="@@hideAll">全部收攏</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <nb-accordion multi class="d-flex flex-wrap col-12 my-3" #fullAccordion>
+        <nb-accordion-item *ngFor="let signage of signageFilter(signageList, template)"
+          class="col-12 col-sm-5 col-lg-3 m-3">
+          <nb-accordion-item-header>
+            {{ signage.id }}
+          </nb-accordion-item-header>
+          <nb-accordion-item-body>
+            <div class="row">
+              <!-- Button List Start -->
+              <div class="d-flex justify-content-end col-12">
+                <button *ngIf="signage.updatable === true && isManager" i18n-nbTooltip="@@settingsToolTip"
+                  nbTooltip="設定" nbTooltipStatus="primary" nbButton ghost status="danger"
+                  (click)="signageSetting(signage)">
+                  <nb-icon icon="settings-2-outline"></nb-icon>
+                </button>
+                <button *ngIf="signage.page" i18n-nbTooltip="@@previewToolTip" nbTooltip="預覽" nbTooltipStatus="primary"
+                  nbButton ghost status="danger" (click)="signagePreview(signage)">
+                  <nb-icon icon="monitor-outline"> </nb-icon>
+                </button>
+                <button *ngIf="signage.publishable === true && isManager" i18n-nbTooltip="@@publishToolTip"
+                  nbTooltip="發佈" nbTooltipStatus="primary" nbButton ghost status="danger"
+                  (click)="publishSignage(signage.id)">
+                  <nb-icon icon="cloud-upload-outline"></nb-icon>
+                </button>
+                <button *ngIf="isManager" i18n-nbTooltip="@@deleteToolTip" nbTooltip="刪除" nbTooltipStatus="primary"
+                  nbButton ghost status="danger" (click)="deleteSignage(signage.id)">
+                  <nb-icon icon="trash-2-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+            <!-- Button List End -->
+          </nb-accordion-item-body>
+        </nb-accordion-item>
+      </nb-accordion>
+    </div>
+  </div>
+  <!-- 樣式 End -->
+</div>
+
+<!-- 看板新增 Start -->
+<ng-template #dialog let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header i18n="SignageHeader|createSignage @@createSignageHeader">新增看板樣式</nb-card-header>
+    <nb-card-body>
+      <div class="my-2">
+        <span i18n="@@signageName">看板名稱</span>
+        <input nbInput #signageId class="mx-2" i18n-placeholder="@@signageNameHint" placeholder="看板名稱"
+          autocomplete="off" />
+      </div>
+      <div class="d-flex align-items-center mb-2">
+        <span i18n="@@selectTemplate">選擇版型</span>
+        <nb-select matRipple [(selected)]="template" class="mx-2">
+          <nb-option matRipple *ngFor="let template of templateList" [value]="template">{{ template }}</nb-option>
+        </nb-select>
+      </div>
+    </nb-card-body>
+    <nb-card-footer>
+      <div class="d-flex justify-content-between">
+        <button nbButton matRipple i18n="@@confirm" status="primary" (click)="createDisplay(signageId.value, ref)">
+          確定
+        </button>
+        <button nbButton matRipple i18n="@@cancel" status="danger" (click)="ref.close()">
+          取消
+        </button>
+      </div>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
+<!-- 看板新增 End -->

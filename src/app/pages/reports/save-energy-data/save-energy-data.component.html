@@ -1,0 +1,70 @@
+<div class="d-flex flex-wrap">
+  <div class="p-1">
+    <div i18n="@@smartPoleNumber" class="mx-2" style="font-size: 1.4rem; margin-top: 10px">智慧桿編號</div>
+  </div>
+  <div class="p-1">
+    <nb-select matRipple [(selected)]="poleData">
+      <nb-option matRipple *ngFor="let poleData of polesData" [value]="poleData">{{ poleData.number }}</nb-option>
+    </nb-select>
+  </div>
+  <div class="p-1">
+    <div i18n="@@scope" class="mx-2" style="font-size: 1.4rem; margin-top: 10px">分析週期</div>
+  </div>
+  <div class="p-1">
+    <nb-select matRipple [(selected)]="dateScope">
+      <nb-option matRipple *ngFor="let dateScope of scopeTypes" [value]="dateScope">{{ dateScope }}</nb-option>
+    </nb-select>
+  </div>
+  <div class="p-1">
+    <input nbInput class="ml-2" [nbDatepicker]="startDate" i18n-placeholder="@@selectStartDate" placeholder="請選擇起始日期"
+      autocomplete="off" />
+    <nb-date-timepicker #startDate singleColumn [step]="60"></nb-date-timepicker>
+    ~
+    <input nbInput class="ml-2" [nbDatepicker]="endDate" i18n-placeholder="@@selectEndDate" placeholder="請選擇結束日期"
+      autocomplete="off" />
+    <nb-date-timepicker #endDate singleColumn [step]="60"></nb-date-timepicker>
+    <button nbButton i18n="@@queryRecord" class="ml-2" size="small" status="primary"
+      (click)="getPoleLogData(poleData, startDate, endDate)"
+      [disabled]="!startDate.visibleDate || !endDate.visibleDate">
+      查詢紀錄
+    </button>
+    <button nbButton i18n="@@exportCSV" *ngIf="poleLogsData" class="ml-2" size="small" status="success"
+      (click)="exportCSV()" [disabled]="poleLogsData?.log?.length <= 0">
+      匯出檔案 ( CSV )
+    </button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row d-flex flex-wrap">
+    <!-- 電量 -->
+    <div *ngIf="batteryLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="batteryLineOptions" class="mt-3"></div>
+    </div>
+
+    <!-- 電池溫度 -->
+    <div *ngIf="temperatureLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="temperatureLineOptions" class="mt-3"></div>
+    </div>
+
+    <!-- 電流 -->
+    <div *ngIf="ampLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="ampLineOptions" class="mt-3"></div>
+    </div>
+
+    <!-- 電壓 -->
+    <div *ngIf="voltLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="voltLineOptions" class="mt-3"></div>
+    </div>
+
+    <!-- 功率 -->
+    <div *ngIf="powerLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="powerLineOptions" class="mt-3"></div>
+    </div>
+
+    <!-- 功耗 -->
+    <div *ngIf="energyLineOptions" class="col-xxxl-12 col-xxl-12">
+      <div echarts [options]="energyLineOptions" class="mt-3"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div style="
+    width: 100%;
+    height: 30vh;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    margin-left: auto;
+    margin-right: auto;
+  " class="d-block d-sm-none">
+  <div style="
+      height: 30vh;
+      background-image: url('../../assets/images/BaoGao_Logo/Logo.png');
+      background-repeat: no-repeat;
+      background-size: 60%;
+      background-position: center;
+      padding-bottom: 10px;
+    "></div>
+</div>
+<h1 id="title" class="title" i18n="@@platform">智慧共桿管理平台</h1>
+<form (ngSubmit)="login()" [formGroup]="user">
+  <div class="form-control-group">
+    <div class="d-flex">
+      <mat-select [(value)]="accessType" class="ml-auto" style="width: 9rem">
+        <mat-option *ngFor="let accesstype of accessTypes" [value]="accesstype">{{ accesstype }}</mat-option>
+      </mat-select>
+    </div>
+    <label i18n="@@accountLabel" class="label">帳號 (Username)</label>
+    <input nbInput class="login-input" fullWidth formControlName="username" type="text"
+      i18n-placeholder="@@inputAccountHint" placeholder="請輸入帳號" fieldSize="large" autofocus [status]="
+        username.dirty ? (username.invalid ? 'danger' : 'success') : 'basic'
+      " [attr.aria-invalid]="username.invalid && username.touched ? true : null" autocomplete="off" />
+    <ng-container *ngIf="username.invalid && (password.dirty || password.touched)">
+      <p i18n="@@accountRequired" class="caption status-danger" *ngIf="username.errors?.required">
+        帳號為<strong>必填</strong>欄位！
+      </p>
+    </ng-container>
+  </div>
+  <div class="form-control-group">
+    <label i18n="@@passwordLabel" class="label">密碼 (Password)</label>
+    <input nbInput class="login-input" fullWidth formControlName="password" type="password"
+      i18n-placeholder="@@inputPasswordHint" placeholder="請輸入密碼" fieldSize="large" [status]="
+        password.dirty ? (password.invalid ? 'danger' : 'success') : 'basic'
+      " [attr.aria-invalid]="password.invalid && password.touched ? true : null" autocomplete="off" />
+    <ng-container *ngIf="password.invalid && (password.dirty || password.touched)">
+      <p i18n="@@passwordRequired" class="caption status-danger" *ngIf="password.errors?.required">
+        密碼為<strong>必填</strong>欄位！
+      </p>
+      <p i18n="@@passwordLengthError" class="caption status-danger" *ngIf="password.errors?.minlength">
+        密碼最少為 {{ globalSettings.minLength }} 碼
+      </p>
+    </ng-container>
+  </div>
+  <button i18n="@@login" nbButton fullWidth status="primary" size="large" [disabled]="submitted || !user.valid"
+    [class.btn-pulse]="submitted">
+    登入
+  </button>
+</form>

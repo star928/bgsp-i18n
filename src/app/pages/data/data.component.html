@@ -1,0 +1,306 @@
+<div class="d-flex flex-wrap m-0">
+  <div class="col-xxl-4 col-lg-6 p-0">
+    <nb-card size="small">
+      <nb-card-header i18n="@@smartPoleStatus">智慧桿狀態</nb-card-header>
+      <nb-card-body>
+        <div class="row row_size">
+          <div class="col-8">
+            <div *ngIf="poleOptions" class="echart" echarts [options]="poleOptions" class="chart_size" id="pole"></div>
+          </div>
+          <div class="d-flex flex-wrap align-items-center col-4">
+            <div class="col-12 p-0 other_label">
+              <span i18n="@@poleAmt">佈建總數</span><br />
+              {{ polesData?.length }}
+            </div>
+            <div class="col-12 p-0 label_set good-status-x2">
+              <span i18n="@@poleActivate">正常運作</span><br />
+              {{ poleConnection }}
+            </div>
+            <div class="col-12 p-0 label_set error-status-x2">
+              <span i18n="@@poleFailure">異常數量</span><br />
+              {{ poleBroken }}
+            </div>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-xxl-4 col-lg-6 p-0">
+    <nb-card size="small">
+      <nb-card-header i18n="@@deviceConnectionStatus">設備連線</nb-card-header>
+      <nb-card-body>
+        <div class="d-flex flex-column">
+          <!-- 照明 Start -->
+
+          <div *ngIf="lightAmount > 0 && lightConnection / lightAmount >= 0.5"
+            class="d-flex align-items-center col-12 mt-3 mb-4">
+            <span i18n="@@smartLightShort" class="col-3 subtitle" style="font-size: 1.4rem">照明</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ lightConnection }}/{{ lightAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(lightConnection / lightAmount) * 100 | number: '1.0-2'"
+              status="primary" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="
+              lightAmount > 0 &&
+              lightConnection / lightAmount > 0 &&
+              lightConnection / lightAmount < 0.5
+            " class="d-flex align-items-center col-12 mt-3 mb-4">
+            <span i18n="@@smartLightShort" class="col-3 subtitle" style="font-size: 1.4rem">照明</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ lightConnection }}/{{ lightAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(lightConnection / lightAmount) * 100 | number: '1.0-2'"
+              status="danger" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="lightAmount > 0 && lightConnection / lightAmount === 0"
+            class="d-flex align-items-center col-12 mt-3 mb-4">
+            <span i18n="@@smartLightShort" class="col-3 subtitle" style="font-size: 1.4rem">照明</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ lightConnection }}/{{ lightAmount }}</span>
+            <nb-progress-bar class="col-7" value="100" size="small" [displayValue]="false">0%
+            </nb-progress-bar>
+          </div>
+
+          <!-- 照明 End -->
+
+          <!-- 環感 Start -->
+
+          <div *ngIf="envAmount > 0 && envConnection / envAmount >= 0.5" class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@environmentShort" class="col-3 subtitle" style="font-size: 1.4rem">環感</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ envConnection }}/{{ envAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(envConnection / envAmount) * 100 | number: '1.0-2'"
+              status="primary" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="
+              envAmount > 0 &&
+              envConnection / envAmount > 0 &&
+              envConnection / envAmount < 0.5
+            " class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@environmentShort" class="col-3 subtitle" style="font-size: 1.4rem">環感</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ envConnection }}/{{ envAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(envConnection / envAmount) * 100 | number: '1.0-2'" status="danger"
+              size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="envAmount > 0 && envConnection / envAmount === 0" class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@environmentShort" class="col-3 subtitle" style="font-size: 1.4rem">環感</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ envConnection }}/{{ envAmount }}</span>
+            <nb-progress-bar class="col-7" value="100" size="small" [displayValue]="false">0%
+            </nb-progress-bar>
+          </div>
+
+          <!-- 環感 End -->
+
+          <!-- 投放 Start -->
+
+          <div *ngIf="playerAmount > 0 && playerConnection / playerAmount >= 0.5"
+            class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@mediaPlayerShort" class="col-3 subtitle" style="font-size: 1.4rem">投放</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ playerConnection }}/{{ playerAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="
+                (playerConnection / playerAmount) * 100 | number: '1.0-2'
+              " status="primary" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="
+              playerAmount > 0 &&
+              playerConnection / playerAmount > 0 &&
+              playerConnection / playerAmount < 0.5
+            " class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@mediaPlayerShort" class="col-3 subtitle" style="font-size: 1.4rem">投放</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ playerConnection }}/{{ playerAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="
+                (playerConnection / playerAmount) * 100 | number: '1.0-2'
+              " status="danger" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="playerAmount > 0 && playerConnection / playerAmount === 0"
+            class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@mediaPlayerShort" class="col-3 subtitle" style="font-size: 1.4rem">投放</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ playerConnection }}/{{ playerAmount }}</span>
+            <nb-progress-bar class="col-7" value="100" size="small" [displayValue]="false">0%
+            </nb-progress-bar>
+          </div>
+
+          <!-- 投放 End -->
+
+          <!-- 儲能 Start -->
+
+          <div *ngIf="solarAmount > 0 && solarConnection / solarAmount >= 0.5"
+            class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@solarShort" class="col-3 subtitle" style="font-size: 1.4rem">儲能</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ solarConnection }}/{{ solarAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(solarConnection / solarAmount) * 100 | number: '1.0-2'"
+              status="primary" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="
+              solarAmount > 0 &&
+              solarConnection / solarAmount > 0 &&
+              solarConnection / solarAmount < 0.5
+            " class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@solarShort" class="col-3 subtitle" style="font-size: 1.4rem">儲能</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ solarConnection }}/{{ solarAmount }}</span>
+            <nb-progress-bar class="col-7" [value]="(solarConnection / solarAmount) * 100 | number: '1.0-2'"
+              status="danger" size="small" [displayValue]="true">
+            </nb-progress-bar>
+          </div>
+          <div *ngIf="solarAmount > 0 && solarConnection / solarAmount === 0"
+            class="d-flex align-items-center col-12 my-4">
+            <span i18n="@@solarShort" class="col-3 subtitle" style="font-size: 1.4rem">儲能</span>
+            <span class="col-2" style="font-size: 1.4rem">{{ solarConnection }}/{{ solarAmount }}</span>
+            <nb-progress-bar class="col-7" value="100" size="small" [displayValue]="false">0%
+            </nb-progress-bar>
+          </div>
+
+          <!-- 儲能 End -->
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="col-xxl-4 col-xl-12 p-0">
+    <nb-card size="small">
+      <nb-card-header i18n="@@alarmEventAmt">告警事件數</nb-card-header>
+      <nb-card-body class="d-flex align-items-center justify-content-center" style="font-size: 9rem">
+        <span style="cursor: pointer" (click)="openAlarmDialog()">{{
+          alarmAmount
+          }}</span>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap mt-4">
+  <div class="col-xxl-8">
+    <div class="row">
+      <div class="col-md-6 p-0">
+        <nb-card size="small">
+          <nb-card-header i18n="@@smartLight">智慧照明</nb-card-header>
+          <nb-card-body>
+            <div class="row row_size">
+              <div class="col-8">
+                <div class="echart" echarts [options]="lightOptions" class="chart_size"></div>
+              </div>
+              <div class="col-4 d-flex flex-column">
+                <div class="p-2" style="margin-top: 30px; padding-left: 20px">
+                  <div *ngIf="lightConnection >= 0" class="col-12 p-0 label_set good-status-x1" style="height: 100%">
+                    <span i18n="@@activateAmt">正常數量</span><br />
+                    {{ lightConnection }}
+                  </div>
+                </div>
+                <div class="p-2" style="margin-top: 20px; padding-left: 20px">
+                  <div *ngIf="lightBroken >= 0" class="col-12 p-0 label_set error-status-x1" style="height: 100%">
+                    <span i18n="@@failureAmt">異常數量</span><br />
+                    {{ lightBroken }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <div class="col-md-6 p-0">
+        <nb-card size="small">
+          <nb-card-header i18n="@@latestTnH">最近 24 小時溫濕度</nb-card-header>
+          <nb-card-body>
+            <div class="d-flex justify-content-center my-1" style="height: 50%; width: 100%"
+              *ngFor="let weatherKey of weatherKeys">
+              <line-chart-lite *ngIf="dataList[weatherKey]" class="echart" [title]="weatherList[weatherKey]"
+                [data]="dataList[weatherKey]"></line-chart-lite>
+              <h2 *ngIf="!dataList[weatherKey]" class="align-self-center">
+                {{ weatherList[weatherKey] }}<span class="ml-5">n/a</span>
+              </h2>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+    <div style="padding: 3px"></div>
+    <div class="row pt-4">
+      <div class="col-md-6 p-0">
+        <nb-card size="tiny">
+          <nb-card-header i18n="@@activatingDevice">設備啟用</nb-card-header>
+          <nb-card-body style="font-size: 1.2rem">
+            <div class="col-12">
+              <span i18n="@@smartLightShort" class="col-4">照明</span>
+              <span i18n="@@totalLightAmt" class="col-4">共 {{ lightAmount }} 組</span>
+              <span class="col-2">
+                <nb-icon icon="toggle-right-outline" style="color: #34a853"></nb-icon>
+                {{ lightEnable }}
+              </span>
+              <span class="col-2">
+                <nb-icon icon="toggle-left-outline" status="basic"></nb-icon>
+                {{ lightAmount - lightEnable }}
+              </span>
+            </div>
+            <div class="col-12">
+              <span i18n="@@enviromentShort" class="col-4">環感</span>
+              <span i18n="@@totalEnviromentAmt" class="col-4">共 {{ envAmount }} 組</span>
+              <span class="col-2">
+                <nb-icon icon="toggle-right-outline" style="color: #34a853"></nb-icon>
+                {{ envEnable }}
+              </span>
+              <span class="col-2">
+                <nb-icon icon="toggle-left-outline" status="basic"></nb-icon>
+                {{ envAmount - envEnable }}
+              </span>
+            </div>
+            <div class="col-12">
+              <span i18n="@@mediaPlayerShort" class="col-4">投放</span>
+              <span i18n="@@totalMediaPlayerAmt" class="col-4">共 {{ playerAmount }} 組</span>
+              <span class="col-2">
+                <nb-icon icon="toggle-right-outline" style="color: #34a853"></nb-icon>
+                {{ playerEnable }}
+              </span>
+              <span class="col-2">
+                <nb-icon icon="toggle-left-outline" status="basic"></nb-icon>
+                {{ playerAmount - playerEnable }}
+              </span>
+            </div>
+            <div class="col-12">
+              <span i18n="@@solarShort" class="col-4">儲能</span>
+              <span i18n="@@totalsolarAmt" class="col-4">共 {{ solarAmount }} 組</span>
+              <span class="col-2">
+                <nb-icon icon="toggle-right-outline" style="color: #34a853"></nb-icon>
+                {{ solarEnable }}
+              </span>
+              <span class="col-2">
+                <nb-icon icon="toggle-left-outline" status="basic"></nb-icon>
+                {{ solarAmount - solarEnable }}
+              </span>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+      <div class="col-md-6 p-0">
+        <nb-card size="tiny">
+          <nb-card-header i18n="@@solarC">儲能電量</nb-card-header>
+          <nb-card-body>
+            <div class="row_size">
+              <div class="echart">
+                <div echarts [options]="batteryOptions" class="chart_size"></div>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xxl-4 p-0">
+    <nb-card size="large">
+      <nb-card-header i18n="@@latestAQI">最近 24 小時空汙值</nb-card-header>
+      <nb-card-body>
+        <div class="d-flex justify-content-center my-1" style="height: 16%; width: 100%" *ngFor="let airKey of airKeys">
+          <line-chart-lite *ngIf="dataList[airKey]" class="echart" [title]="airList[airKey]" [data]="dataList[airKey]">
+          </line-chart-lite>
+          <h4 *ngIf="!dataList[airKey]" class="align-self-center">
+            {{ airList[airKey] }}<span class="ml-5">n/a</span>
+          </h4>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>

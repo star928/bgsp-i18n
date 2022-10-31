@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Signage</title>
+
+<style type="text/css">
+* {
+  margin: 0;
+}
+
+body, html {
+  color: white;
+  background-color: #000000;
+  height: 100%;
+  margin:0;
+  padding:0;
+}
+
+.body > * {
+  padding: 0px;
+}
+
+#header {
+  position:fixed;
+  width:100%; height:22%;
+  top:0; right:0; bottom:22%; left:0;
+  background: #000000;
+  margin:0;
+  padding:0;
+}
+
+#main {
+  position:fixed;
+  width:100%; height:39%;
+  top:10% ; right:0; bottom:61%; left:0;
+  background: #000000;
+  margin:0;
+  padding:0;
+}
+
+#footer {
+  position:fixed;
+  width:100%; height:39%;
+  top:61%; right:0; bottom:100%; left:0;
+  background: #000000;
+  margin:0;
+  padding:0;
+}
+</style>
+
+<script src="/js/mqtt.min.js"></script>
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+</head>
+<body>
+  <div id="header">
+  <!--
+    <marquee id="marquee" direction="left" scrollamount="5" behavior="scroll" style="height:100%; width:100%; color:yellow; font-size: 8vh; font-family:'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;">
+      <h1><span id="debug_info">.</span></h1>
+    </marquee>
+  -->
+  </div>
+
+  <div id="main">
+    <img id="image" src="/images/bg_2741.jpg" alt="photo" style="height: 100%;width: 100%;">
+    <video autoplay id="video" style="height: 100%;width: 100%;">
+    </video>
+  </div>
+
+  <div id="footer">
+    <img id="image2" src="/images/bg_2741.jpg" alt="photo" style="height: 100%;width: 100%;">
+    <video autoplay id="video2" style="height: 100%;width: 100%;">
+    </video>
+  </div>
+
+<script type="text/javascript">
+var first_time = 0;
+var play_mode = "center";
+var img_play_time = 5000;
+var current_media = {"media_type":"img","src":"first"};
+var current_media_main2 = {"media_type":"img","src":"first"};
+var g_url_domain;
+var g_url_display;
+var g_url_imgtime;
+
+function doUpdate(file_info)
+{
+  var filename = file_info.file;
+  var file_type = filename.substr(filename.length - 3);
+
+  file_type = file_type.toLowerCase();
+  if((file_type == "jpg") ||
+     (file_type == "png") ||
+     (file_type == "gif") ||
+     (file_type == "bmp")) {
+    current_media.media_type = "img";
+  } else {
+    current_media.media_type = "vdo";
+  }
+
+  current_media.src = file_info.file;
+
+  window.sessionStorage['MainMediaType'] = current_media.media_type;
+  window.sessionStorage['MainMediaSrc'] = current_media.src;
+
+  play_next_media();
+}
+
+function doUpdateMain2(file_info)
+{
+  var filename = file_info.file;
+  var file_type = filename.substr(filename.length - 3);
+
+  file_type = file_type.toLowerCase();
+  if((file_type == "jpg") ||
+     (file_type == "png") ||
+     (file_type == "gif") ||
+     (file_type == "bmp")) {
+    current_media_main2.media_type = "img";
+  } else {
+    current_media_main2.media_type = "vdo";
+  }
+
+  current_media_main2.src = file_info.file;
+
+  window.sessionStorage['Main2MediaType'] = current_media_main2.media_type;
+  window.sessionStorage['Main2MediaSrc'] = current_media_main2.src;
+
+  play_next_media_main2();
+}
+
+function getNewFile(source)
+{
+  var new_file = {};
+
+  if(play_mode == "center") {
+    new_file.id = g_url_display;
+  }
+
+  new_file.source = source;
+
+  if(source == "main2") {
+    new_file.file = current_media_main2.src;
+  } else {
+    new_file.file = current_media.src;
+  }
+  return new_file;
+}
+
+function doUpdateContainerMain()
+{
+  doQueryFile("main");
+}
+
+function doUpdateContainerMain2()
+{
+  doQueryFile("main2");
+}
+
+function doQueryFile(container)
+{
+  var cgi_url;
+  var new_file = getNewFile(container);
+
+  if(play_mode == "center") {
+    cgi_url = '/cgi-center/display/' + g_url_domain;
+  } else {
+    cgi_url = '/cgi-device/display';
+  }
+
+  $.ajax({
+    method: 'POST',
+    url: cgi_url,
+    cache: false,
+    data: JSON.stringify(new_file),
+    contentType: 'application/json',
+    dataType: 'json',
+    beforeSend: function(xhr) {
+    },
+    success: function(json, textStatus, jqXHR) {
+      if(container == "main") {
+        doUpdate(json);
+      } else if(container == "main2") {
+        doUpdateMain2(json);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log("doQueryFile fail:" + jqXHR.status);
+    },
+    complete: function(result) {
+      if(first_time) {
+        if(container == "main") {
+          doUpdateContainerMain2();
+        } else {
+          doQueryMarquee();
+          first_time = 0;
+        }
+      }
+    }
+  });
+}
+
+function getNewMarquee(source)
+{
+  var new_marquee = {};
+
+  if(play_mode == "center") {
+    new_marquee.id = g_url_display;
+  }
+
+  new_marquee.source = source;
+  new_marquee.text = "";
+
+  return new_marquee;
+}
+
+function doQueryMarquee()
+{
+  var cgi_url;
+  var new_marquee = getNewMarquee("marqueetext");
+
+  if(play_mode == "center") {
+    cgi_url = '/cgi-center/display/' + g_url_domain;
+  } else {
+    cgi_url = '/cgi-device/display';
+  }
+
+  $.ajax({
+    method: 'POST',
+    url: cgi_url,
+    cache: false,
+    data: JSON.stringify(new_marquee),
+    contentType: 'application/json',
+    dataType: 'json',
+    beforeSend: function(xhr) {
+    },
+    success: function(json, textStatus, jqXHR) {
+      if(json && json.text != "") {
+        var marquee = '<marquee direction="left" scrollamount="5" behavior="scroll" style="height:100%; width:100%; color:yellow; font-size: 8vh; font-family:"Arial","LiHei Pro","黑體-繁","微軟正黑體", sans-serif !important;font-weight: bold;">' +
+                      '<h1><span>' +
+                       json.text +
+                       '</span></h1>' +
+                       '</marquee>';
+
+        $("#header").html(marquee);
+        $("#header").css("height","22%");
+        $("#main").css("top","22%");
+        $("#main").css("height","39%");
+        $("#footer").css("top","61%");
+        $("#footer").css("height","39%");
+        $("#header").css("display","block");
+      } else {
+        var marquee = '<marquee><h1><span>.</span></h1></marquee>';
+
+        $("#header").html(marquee);
+        $("#header").css("height","0%");
+        $("#main").css("top","0%");
+        $("#main").css("height","50%");
+        $("#footer").css("top","50%");
+        $("#footer").css("height","50%");
+        $("#header").css("display","none");
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var marquee = '<marquee><h1><span>.</span></h1></marquee>';
+
+      console.log("doQueryMarquee fail:" + jqXHR.status);
+      // disable marquee
+      $("#header").html(marquee);
+      $("#header").css("height","1%");
+      $("#main").css("top","0");
+      $("#main").css("height","50%");
+      $("#footer").css("top","50%");
+      $("#footer").css("height","50%");
+      $("#header").css("display","none");
+    },
+    complete: function(result) {
+    }
+  });
+}
+
+function dochkChangePage(page_info)
+{
+  if(page_info.pause) {
+    var szEntryUrl = '/device/digital_signage/index.html' + '?domain=' + g_url_domain;
+
+    window.location.replace(szEntryUrl);
+  } else {
+    if(page_info.page != "template_3") {
+      var szImgTime = '&imgtime=' + (img_play_time/1000);
+      var szEntryUrl = '/device/digital_signage/ds/' +
+                        page_info.page + '.html' +
+                        '?domain=' + g_url_domain + szImgTime;
+
+      window.location.replace(szEntryUrl);
+    } else {
+      if(current_media.media_type == "img") {
+        if(vTimer != null) {
+          clearTimeout(vTimer);
+          vTimer = null;
+        }
+      } else if(current_media.media_type == "vdo") {
+        vobj.pause();
+        vobj.currentTime = 0;
+      }
+
+      if(current_media_main2.media_type == "img") {
+        if(vTimer_main2 != null) {
+          clearTimeout(vTimer_main2);
+          vTimer_main2 = null;
+        }
+      } else if(current_media_main2.media_type == "vdo") {
+        vobj2.pause();
+        vobj2.currentTime = 0;
+      }
+      // set to reload page 1 time
+      first_time = 1;
+      doUpdateContainerMain();
+    }
+  }
+}
+
+var iobj = document.getElementById('image');
+var iobj2 = document.getElementById('image2');
+
+var vobj = document.getElementById('video');
+var vobj2 = document.getElementById('video2');
+
+var vTimer = null;
+var vTimer_main2 = null;
+
+function play_next_media()
+{
+  if(current_media.media_type == "img") {
+    if(play_mode == "center") {
+      iobj.src = location.origin + '/resource-center/' + current_media.src;
+    } else {
+      iobj.src = location.origin + '/resource-device/' + current_media.src;
+    }
+
+    if(iobj.style.display != "block") {
+      iobj.style.display = "block";
+    }
+
+    if(vobj.style.display != "none") {
+      vobj.style.display = "none";
+    }
+
+    vTimer = setTimeout(doUpdateContainerMain , img_play_time);
+  } else if(current_media.media_type == "vdo") {
+    clearTimeout(vTimer);
+    vTimer = null;
+
+    if(play_mode == "center") {
+      vobj.src = location.origin + '/resource-center/' + current_media.src;
+    } else {
+      vobj.src = location.origin + '/resource-device/' + current_media.src;
+    }
+
+    vobj.load();
+
+    vobj.style.display = "block";
+    iobj.style.display = "none";
+  }
+}
+
+function play_next_media_main2()
+{
+  if(current_media_main2.media_type == "img") {
+    if(play_mode == "center") {
+      iobj2.src = location.origin + '/resource-center/' + current_media_main2.src;
+    } else {
+      iobj2.src = location.origin + '/resource-device/' + current_media_main2.src;
+    }
+
+    if(iobj2.style.display != "block") {
+      iobj2.style.display = "block";
+    }
+
+    if(vobj2.style.display != "none") {
+      vobj2.style.display = "none";
+    }
+
+    vTimer_main2 = setTimeout(doUpdateContainerMain2 , img_play_time);
+  } else if(current_media_main2.media_type == "vdo") {
+    clearTimeout(vTimer_main2);
+    vTimer_main2 = null;
+
+    if(play_mode == "center") {
+      vobj2.src = location.origin + '/resource-center/' + current_media_main2.src;
+    } else {
+      vobj2.src = location.origin + '/resource-device/' + current_media_main2.src;
+    }
+
+    vobj2.load();
+
+    vobj2.style.display = "block";
+    iobj2.style.display = "none";
+  }
+}
+
+vobj.addEventListener('ended', function() {
+  doUpdateContainerMain();
+});
+
+vobj2.addEventListener('ended', function() {
+  doUpdateContainerMain2();
+});
+
+function doMqttChkChangePage()
+{
+  var host = window.location.host;
+  // wss is ok at https , but ws is not ok at https // the server must open wss
+  // var url = 'wss://' + host + '/mqtt';
+  // ws is ok at http , our project is run at local , so http is enough .
+  var url = 'ws://' + host + '/mqtt';
+  let options = {
+    clean: true,
+    keepalive: 30,
+    //username: 'rw',
+    //password: 'readwrite',
+    //reconnectPeriod: 0,
+    //rejectUnauthorized: false
+  }
+  var client = mqtt.connect(
+    url,
+    options
+  );
+
+  /*
+  test command
+  mosquitto_pub -p 1886 -t 'apexx/control/mediaPlayer' -m '{"page":"template_1","interval":5, "pause":false}'
+  */
+  client.on('connect', function() {
+    client.subscribe('apexx/control/mediaPlayer');
+  });
+
+  client.on('message', function (topic, payload) {
+    //console.log([topic, payload].join(": "));
+    var jPaylod = JSON.parse(payload);
+
+    dochkChangePage(jPaylod);
+  });
+}
+
+$(document).ready(function() {
+  var urlParams = new URLSearchParams(window.location.search);
+
+  if(window.location.pathname.includes("center")) {
+    play_mode = "center";
+  } else {
+    play_mode = "device";
+  }
+
+  if((window.sessionStorage['MainMediaType'] != undefined) &&
+     (window.sessionStorage['MainMediaSrc'] != undefined)) {
+    current_media.media_type = window.sessionStorage['MainMediaType'];
+    current_media.src = window.sessionStorage['MainMediaSrc'];
+  }
+
+  if((window.sessionStorage['Main2MediaType'] != undefined) &&
+     (window.sessionStorage['Main2MediaSrc'] != undefined)) {
+    current_media_main2.media_type = window.sessionStorage['Main2MediaType'];
+    current_media_main2.src = window.sessionStorage['Main2MediaSrc'];
+  }
+
+  g_url_domain = urlParams.get('domain');
+
+  if(play_mode == "center") {
+    g_url_display = urlParams.get('preview');
+  }
+
+  g_url_imgtime = urlParams.get('imgtime');
+
+  if(g_url_imgtime != null) {
+    var img_time_tmp = parseInt(g_url_imgtime, 10);
+    if((img_time_tmp > 0) && (img_time_tmp < 86400)) {
+      // sec ; max is 1 days
+      img_play_time = img_time_tmp * 1000;  // msec
+    }
+  }
+
+  if(window.location.pathname.includes("center")) {
+    first_time = 1;
+    doUpdateContainerMain();
+  } else {
+    doMqttChkChangePage();
+  }
+});
+
+$(window).on('resize', function(){
+  location.reload();
+});
+
+</script>
+</body>
+</html>

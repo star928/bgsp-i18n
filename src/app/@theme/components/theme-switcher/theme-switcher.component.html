@@ -1,0 +1,22 @@
+<style>
+  .down {
+    padding-top: 5px;
+  }
+</style>
+
+<div class="row align-items-center">
+  <div class="col-3 px-0">
+    <nb-icon icon="sun-outline" size="tiny"></nb-icon>
+  </div>
+  <div class="col-6 px-0">
+    <!-- nb-toggle -->
+    <nb-toggle
+      class="down"
+      (checkedChange)="changeTheme($event)"
+      [(checked)]="isDarkTheme"
+    ></nb-toggle>
+  </div>
+  <div class="col-3 pl-1">
+    <nb-icon icon="moon-outline" size="tiny"></nb-icon>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+.echart {
+  width: 100%;
+  height: 100%;
+}
+
+.label_set {
+  height: 20%;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5rem;
+  font-size: 1rem;
+}
+
+nb-card {
+  margin: 0%;
+}
+
+nb-card-header {
+  padding: 0.3%;
+  padding-left: 0.3vw;
+  color: #de3e69;
+  height: 10;
+  font-size: 1rem;
+}
+
+nb-card-body {
+  overflow: hidden;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+
+  div {
+    padding: 0;
+  }
+
+  span {
+    padding-left: 0;
+  }
+}
+
+nb-icon {
+  line-height: 2em;
+  width: 2em;
+  height: 2em;
+}
+
+.section {
+  display: inline-block;
+  height: 100%;
+  margin: 0;
+  width: 100%;
+  border: 1px solid #000;
+}
+
+/* 文字垂直置中 */
+.text-v-center {
+  vertical-align: top;
+}
+
+.text-v-center:before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.text-v-center p {
+  display: inline-block;
+}
+
+.chart_size {
+  height: 100%;
+  width: 100%;
+}
+
+.chart_size_small {
+  height: 100%;
+  width: 100%;
+}
+
+.row_size {
+  height: 100%;
+}
+
+.label_margin {
+  margin-top: 2rem;
+  margin-bottom: 0.3rem;
+}
+
+.control_margin {
+  margin-top: 1.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.chart_margin {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.other_label {
+  height: 20%;
+  width: 100%;
+  text-align: center;
+  line-height: 1.5rem;
+  font-size: 1rem;
+}
+
+.good-status-x1 {
+  border-left: 0.5rem solid rgb(66, 170, 255);
+}
+
+.good-status-x2 {
+  border-left: 0.5rem solid rgb(66, 170, 255);
+}
+
+.error-status-x1 {
+  border-left: 0.5rem solid rgb(255, 201, 77);
+}
+
+.error-status-x2 {
+  border-left: 0.5rem solid rgb(255, 201, 77);
+}

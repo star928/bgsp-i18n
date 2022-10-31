@@ -1,0 +1,18 @@
+.area {
+  border: solid;
+  border-color: black;
+  border-width: 2px;
+}
+
+nb-card {
+  overflow: auto;
+}
+
+:host ::ng-deep th {
+  min-width: 105px;
+}
+
+.table-icon {
+  width: 3%;
+  height: 3%;
+}

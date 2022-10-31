@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 58.8 58.8">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #34a853;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-1 {
+        stroke-width: 3px;
+      }
+
+      .cls-2 {
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <title>icon new</title>
+  <g id="圖層_1" data-name="圖層 1">
+    <polygon class="cls-1" points="30.19 9.84 18.19 13.94 28.86 19.46 41.42 13.11 30.19 9.84" />
+    <polyline class="cls-1" points="18.19 13.94 14.08 37.71 28.97 48.96 44.72 38.83 41.42 13.11" />
+    <line class="cls-1" x1="28.86" y1="19.46" x2="28.97" y2="48.96" />
+    <line class="cls-2" x1="32.91" y1="28.22" x2="33.1" y2="34.77" />
+  </g>
+</svg>

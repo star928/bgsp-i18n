@@ -1,0 +1,112 @@
+<div class="row d-flex flex-wrap">
+  <div class="p-1">
+    <nb-card size="small" style="height: 100%">
+      <nb-card-header i18n="@@manageAccount">帳號管理</nb-card-header>
+      <nb-card-body class="m-0">
+        <div class="my-2">
+          <span i18n="@@selectAccount">選擇帳號</span><span *ngIf="account" class="required">*</span>
+          <nb-select *ngIf="!account" class="mx-4" matRipple [(selected)]="account"
+            (selectedChange)="onAccountSelected($event)">
+            <nb-option matRipple *ngFor="let account of accountList" [value]="account">{{ account.id }}</nb-option>
+          </nb-select>
+          <nb-select *ngIf="account" class="mx-2" matRipple [(selected)]="account"
+            (selectedChange)="onAccountSelected($event)">
+            <nb-option matRipple *ngFor="let account of accountList" [value]="account">{{ account.id }}</nb-option>
+          </nb-select>
+        </div>
+
+        <form [formGroup]="accountForm">
+          <div class="my-2">
+            <span i18n="@@inputAccount">輸入帳號</span><span *ngIf="!account" class="required">*</span>
+            <input *ngIf="!account" nbInput type="text" formControlName="id" i18n-placeholder="@@inputAccountHint"
+              placeholder="請輸入帳號" fieldSize="large" class="mx-2" autocomplete="off" />
+            <input *ngIf="account" nbInput type="text" formControlName="id" i18n-placeholder="@@inputAccountHint"
+              placeholder="請輸入帳號" fieldSize="large" class="mx-4" disabled autocomplete="off" />
+          </div>
+          <div class="my-2">
+            <span i18n="@@inputPassword">輸入密碼</span><span *ngIf="!account" class="required">*</span>
+            <input *ngIf="!account" nbInput type="password" formControlName="passwd_hash"
+              i18n-placeholder="@@inputPasswordHint" placeholder="請輸入密碼" fieldSize="large" class="mx-2"
+              autocomplete="off" />
+            <input *ngIf="account" nbInput type="password" formControlName="passwd_hash"
+              i18n-placeholder="@@inputPasswordHint" placeholder="請輸入密碼" fieldSize="large" class="mx-4"
+              autocomplete="off" />
+            <ng-container *ngIf="
+                passwd_hash.invalid &&
+                (passwd_hash.dirty || passwd_hash.touched)
+              ">
+              <p i18n="@@passwordRequired" class="caption status-danger" *ngIf="passwd_hash.errors?.required">
+                密碼為<strong>必填</strong>欄位！
+              </p>
+              <p i18n="@@passwordLengthError" class="caption status-danger" *ngIf="passwd_hash.errors?.minlength">
+                密碼最少為 {{ globalSettings.minLength }} 碼
+              </p>
+            </ng-container>
+          </div>
+          <div class="my-2">
+            <span i18n="@@confirmPassword">確認密碼</span><span *ngIf="!account" class="required">*</span>
+            <input *ngIf="!account" nbInput [formControl]="confirmPasswd" type="password"
+              i18n-placeholder="@@enterPasswordAgainHint" placeholder="請再次輸入密碼" fieldSize="large" class="mx-2"
+              autocomplete="off" />
+            <input *ngIf="account" nbInput [formControl]="confirmPasswd" type="password"
+              i18n-placeholder="@@enterPasswordAgainHint" placeholder="請再次輸入密碼" fieldSize="large" class="mx-4"
+              autocomplete="off" />
+            <p i18n="@@passwordCheckError" class="caption status-danger" *ngIf="
+                confirmPasswd.value !== '' &&
+                confirmPasswd.value !== accountForm.value.passwd_hash
+              ">
+              請確認密碼一致
+            </p>
+          </div>
+          <div class="my-2">
+            <nb-checkbox i18n="@@enable" status="primary" formControlName="enable">啟用
+            </nb-checkbox>
+          </div>
+        </form>
+
+        <button nbButton status="primary" size="medium" class="mt-4 mx-1" (click)="saveAccount()" [disabled]="
+            submitted ||
+            !accountForm.valid ||
+            confirmPasswd.value !== accountForm.value.passwd_hash
+          ">
+          {{ type }} <span i18n="@@account">帳號</span>
+        </button>
+        <button nbButton i18n="@@resetForm" status="warning" size="medium" class="mt-4 mx-1" (click)="cleanInput()">
+          清除資料
+        </button>
+        <button nbButton i18n="@@deleteAccount" status="danger" size="medium" class="mt-4 mx-1"
+          (click)="deleteAccount()" [disabled]="submitted || !account">
+          刪除帳號
+        </button>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <div class="p-1 mx-2 d-flex align-items-center">
+    <div class="d-flex flex-wrap justify-content-center">
+      <button nbButton i18n="@@add" status="primary" size="large" (click)="addManager()">加入</button>
+      <button nbButton i18n="@@remove" status="danger" size="large" (click)="removeManager()">
+        移出
+      </button>
+    </div>
+  </div>
+
+  <div class="p-1">
+    <nb-card size="small" style="height: 100%">
+      <nb-card-header i18n="@@managerList">管理者列表</nb-card-header>
+      <nb-card-body>
+        <nb-list *ngIf="domain">
+          <nb-list-item matRipple *ngFor="let manager of domain.manager">
+            <div>
+              {{ manager }}
+            </div>
+          </nb-list-item>
+        </nb-list>
+        <button nbButton i18n="@@saveSettings" status="primary" size="medium" class="mt-2" (click)="saveDomainSetting()"
+          [disabled]="submitted">
+          儲存設定
+        </button>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>

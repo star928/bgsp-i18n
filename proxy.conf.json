@@ -1,0 +1,12 @@
+{
+  "/cgi-center": {
+    "target": "https://smartpole.baogao-ipark.ntpc.gov.tw",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/resource-center": {
+    "target": "https://smartpole.baogao-ipark.ntpc.gov.tw",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

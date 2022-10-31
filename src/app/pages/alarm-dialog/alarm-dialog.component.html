@@ -1,0 +1,19 @@
+<nb-card size="large">
+  <nb-card-header>
+    <div class="row">
+      <div i18n="alarmHeader @@alarm" class="col-3">
+        告警事項
+      </div>
+      <div class="col-9 d-flex justify-content-end">
+        <div class="col-9 d-flex justify-content-end">
+          <nb-icon icon="close-circle-outline" style="transform: scale(1.2); cursor: pointer;" (click)="close()">
+          </nb-icon>
+        </div>
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source">
+    </ng2-smart-table>
+  </nb-card-body>
+</nb-card>

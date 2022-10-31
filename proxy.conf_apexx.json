@@ -1,0 +1,12 @@
+{
+  "/cgi-center": {
+    "target": "https://apexx.duckdns.org:4433",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/resource-center": {
+    "target": "https://apexx.duckdns.org:4433",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

@@ -1,0 +1,121 @@
+@import "../../../@theme/styles/themes";
+
+nb-card {
+  transform: translate3d(0, 0, 0);
+  padding: 0%;
+}
+
+nb-card-header {
+  //align-items: start;
+  //text-align: center;
+  //text-shadow: 2px;
+  padding: 0.3%;
+  padding-left: 0.3vw;
+  color: #de3e69;
+  height: 10;
+  font-size: 1rem;
+}
+
+nb-card-body {
+  overflow-y: hidden;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+@include nb-install-component() {
+  /* Leaflet Map */
+  ::ng-deep .leaflet-top,
+  ::ng-deep .leaflet-bottom {
+    z-index: 997;
+  }
+
+  ::ng-deep .leaflet-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  ::ng-deep .leaflet-control-zoom a {
+    text-decoration: none;
+  }
+}
+
+.header {
+  font-size: large;
+}
+
+.content {
+  font-size: medium;
+}
+
+.align_center {
+  align-items: center;
+  text-align: center;
+}
+
+.icon_size {
+  height: 4rem;
+  width: 4rem;
+}
+
+.container_size {
+  height: 15rem;
+  width: 50rem;
+  border-width: 3px;
+  padding-left: 2%;
+}
+
+#msgPost {
+  nb-card-body {
+    overflow-y: scroll;
+  }
+}
+
+#overviewPhoto {
+  height: 10rem;
+  width: 5.6rem;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+#Map {
+  nb-card-body {
+    padding: 0rem;
+  }
+}
+
+#warningTable {
+  nb-card-body {
+    padding: 0rem;
+  }
+}
+
+:host ::ng-deep td.ng-star-inserted {
+  padding: 0.3rem;
+}
+
+:host ::ng-deep th.ng2-smart-th.date.ng-star-inserted {
+  padding: 0.3rem;
+}
+
+:host ::ng-deep th.ng2-smart-th.timeScope.ng-star-inserted {
+  padding: 0.3rem;
+}
+
+:host ::ng-deep th.ng2-smart-th.state.ng-star-inserted {
+  padding: 0.3rem;
+}
+
+:host ::ng-deep ul.ng2-smart-pagination.pagination {
+  margin: 0%;
+  position: absolute;
+  bottom: 2%;
+
+  .ng2-smart-page-item {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+  .ng2-smart-page-link {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+}

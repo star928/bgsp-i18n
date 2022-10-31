@@ -1,0 +1,58 @@
+:host {
+  .title {
+    color: #222b45;
+  }
+  .login-input {
+    background-color: #f7f9fc;
+    border-color: #e4e9f2;
+    color: #000;
+
+    &:placeholder {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2;
+    }
+    &:focus {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2;
+    }
+    &:hover {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2;
+    }
+    &:disabled {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2;
+    }
+  }
+
+  .select-button {
+    background-color: #f7f9fc;
+    color: #000;
+  }
+
+  nb-select.ml-auto ::ng-deep {
+    //button
+    .select-button {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2 !important;
+      color: #000;
+
+      &:focus {
+        background-color: #f7f9fc;
+        border-color: #e4e9f2;
+      }
+
+      &:hover {
+        background-color: #f7f9fc;
+        border-color: #e4e9f2;
+      }
+    }
+    //nb-select
+    .cdk-overlay-container .cdk-overlay-pane nb-option-list {
+      .option-list {
+        background-color: #fff;
+        color: #000;
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+nb-card {
+  overflow: auto;
+}
+
+:host ::ng-deep th {
+  min-width: 150px;
+}
+

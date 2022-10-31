@@ -1,0 +1,19 @@
+.required {
+  color: #ff3d71;
+  margin-left: 0.5rem;
+}
+
+:host ::ng-deep th.ng2-smart-th.scope.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-th.brightness.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-th.actions.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}

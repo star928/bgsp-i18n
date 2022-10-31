@@ -1,0 +1,117 @@
+<nb-card size="large">
+  <nb-card-header>
+    <div class="row">
+      <div i18n="@@settings" class="col-3">設定</div>
+      <div class="col-9 d-flex justify-content-end">
+        <div class="col-9 d-flex justify-content-end">
+          <nb-icon icon="close-circle-outline" style="transform: scale(1.2); cursor: pointer"
+            (click)="closeDialog(true)"></nb-icon>
+        </div>
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <nb-tabset>
+      <!-- <nb-tab tabTitle="版型" *ngIf="!signage.page">
+        選擇版型
+        <br />
+        <nb-select matRipple [(selected)]="template">
+          <nb-option matRipple *ngFor="let template of templateList" [value]="template">{{ template }}</nb-option>
+        </nb-select>
+      </nb-tab> -->
+      <nb-tab i18n-tabTitle="@@data" tabTitle="內容" *ngIf="signage.page">
+        <!-- form Start -->
+
+        <form [formGroup]="media">
+          <div *ngIf="signage.id?.startsWith('直式三層')">
+            <div class="d-flex align-items-center" style="font-size: 1.4rem">
+              <span i18n="@@marqueeText" class="mx-2">跑馬燈文字</span>
+              <input nbInput type=" text" formControlName="text" i18n-placeholder="@@inputMarqueeTextHint"
+                placeholder="請輸入跑馬燈文字" autocomplete="off" />
+              <button nbButton matRipple i18n="@@modifyMarquee" status="primary" class="mx-2" (click)="updateMarquee()">
+                修改跑馬燈內容
+              </button>
+            </div>
+          </div>
+
+          <nb-accordion>
+            <!-- 檔案區 Start -->
+            <nb-accordion-item>
+              <nb-accordion-item-header>
+                <span i18n="@@uploadFile">上傳檔案</span>
+              </nb-accordion-item-header>
+              <nb-accordion-item-body>
+                <div i18n="@@allowFileType" class="mb-2 notify">檔案容許格式</div>
+                <div class="mb-2 notify" *ngFor="let acceptType of acceptTypes">
+                  {{ acceptType[0] }} - {{ acceptType[1] }}
+                </div>
+                <div *ngFor="
+                    let sourceId of sourceList[signage.page];
+                    index as num
+                  ">
+                  <span *ngIf="sourceId.startsWith('main')">{{ sources[sourceId] }}
+                    <nb-card size="tiny" class="media_file my-2">
+                      <nb-card-header *ngIf="sourceId.startsWith('main')">
+                        <input nbInput type="file" (change)="selectFiles($event.target.files, num)" multiple
+                          accept="video/*,image/*" />
+                      </nb-card-header>
+                      <nb-card-body>
+                        <div class="m-2" *ngFor="
+                            let mediaFile of findSource(sourceId)?.file;
+                            index as index
+                          ">
+                          <span i18n="@@file">檔案</span>{{ index + 1 }}: {{ mediaFile.id }}
+                          <button nbButton matRipple i18n="@@prviewFile" status="primary" class="mx-2"
+                            (click)="previewFile(mediaFile.uuid)">
+                            預覽檔案
+                          </button>
+                          <button nbButton matRipple i18n="@@deleteFile" status="danger"
+                            (click)="deleteFile(sourceId, mediaFile)">
+                            刪除檔案
+                          </button>
+                        </div>
+                        <div *ngIf="uploadProgress">
+                          <div *ngFor="let progress of uploadProgress[sourceId]">
+                            <span i18n="@@filename">檔案名稱</span>: {{ progress["name"] }}
+                            <nb-progress-bar class="col-8" [value]="progress['percent']" status="primary" size="small"
+                              [displayValue]="true">
+                            </nb-progress-bar>
+                          </div>
+                        </div>
+                      </nb-card-body>
+                    </nb-card>
+                  </span>
+                </div>
+                <button i18n="@@uploadFile" nbButton status="primary" class="my-2" [disabled]="isUploading"
+                  (click)="upload(signage.page)">上傳檔案</button>
+              </nb-accordion-item-body>
+            </nb-accordion-item>
+            <!-- 檔案區 End -->
+
+            <!-- 輪播 Start -->
+            <nb-accordion-item>
+              <nb-accordion-item-header>
+                <span i18n="@@advSettings">進階設定</span>
+              </nb-accordion-item-header>
+              <nb-accordion-item-body>
+                <div class="d-flex align-items-center" style="font-size: 1.2rem">
+                  <span i18n="@@picInterval">照片輪播間隔</span>
+                  <input nbInput type="number" formControlName="interval" min="0" class="mx-2" style="width: 5em"
+                    autocomplete="off" />
+                  <span i18n="@@second">秒</span>
+                  <button nbButton matRipple i18n="@@modifyPicInterval" status="primary" class="mx-2"
+                    (click)="updateCarouselTime()">
+                    修改照片輪播間隔
+                  </button>
+                </div>
+              </nb-accordion-item-body>
+            </nb-accordion-item>
+            <!-- 輪播 End -->
+          </nb-accordion>
+        </form>
+
+        <!-- form End -->
+      </nb-tab>
+    </nb-tabset>
+  </nb-card-body>
+</nb-card>

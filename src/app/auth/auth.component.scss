@@ -1,0 +1,68 @@
+@import "~@nebular/theme/styles/global/breakpoints";
+
+:host {
+  $auth-layout-padding: 0rem;
+
+  nb-card {
+    margin: 0;
+    height: calc(100vh - 2 * #{$auth-layout-padding});
+    background-color: white;
+    border: 0rem;
+    border-radius: 0rem;
+  }
+
+  .navigation .link {
+    display: inline-block;
+    text-decoration: none;
+
+    nb-icon {
+      font-size: 2rem;
+      vertical-align: middle;
+    }
+  }
+
+  .links nb-icon {
+    font-size: 2.5rem;
+  }
+
+  nb-card-body {
+    display: flex;
+    width: 100%;
+  }
+
+  nb-auth-block {
+    margin: auto;
+  }
+
+  .background {
+    height: 100vh;
+    width: 50vw;
+    background-image: url("../../assets/images/BaoGao_Logo/Logo.png");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    background-color: #edf1f7;
+  }
+
+  .img {
+    height: calc(100vh - 2 * #{$auth-layout-padding});
+    width: 50vw;
+  }
+
+  @include media-breakpoint-down(sm) {
+    nb-card {
+      border-radius: 0;
+      height: 100vh;
+    }
+  }
+
+  ::ng-deep {
+    nb-layout .layout .layout-container .content .columns nb-layout-column {
+      padding: $auth-layout-padding;
+
+      @include media-breakpoint-down(sm) {
+        padding: 0;
+      }
+    }
+  }
+}

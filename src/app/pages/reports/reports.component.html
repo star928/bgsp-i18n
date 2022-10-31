@@ -1,0 +1,38 @@
+<div class="col-xl-12 p-0">
+  <!-- <img
+    src="{{ preview_image }}"
+    width="100%"
+    alt="預覽圖片"
+    style="margin-bottom: 10px"
+  /> -->
+</div>
+
+<nb-tabset (changeTab)="changeTab($event)">
+  <!-- 智慧照明 Start -->
+  <nb-tab i18n-tabTitle="@@smartLightTabTitle" tabTitle="智慧照明">
+    <smart-light-data *ngIf="polesData" [deviceType]="deviceType" [polesData]="polesData"
+      (clickExportCSV)="exportCSV($event)"></smart-light-data>
+  </nb-tab>
+  <!-- 智慧照明 End -->
+
+  <!-- 環境感測 Start -->
+  <nb-tab i18n-tabTitle="@@environmentTabTitle" tabTitle="環境感測">
+    <env-sensor-data *ngIf="polesData" [deviceType]="deviceType" [polesData]="polesData"
+      (clickExportCSV)="exportCSV($event)"></env-sensor-data>
+  </nb-tab>
+  <!-- 環境感測 End -->
+
+  <!-- 儲能系統 Start -->
+  <nb-tab i18n-tabTitle="@@solarTabTitle" tabTitle="儲能系統">
+    <save-energy-data *ngIf="polesData" [deviceType]="deviceType" [polesData]="polesData"
+      (clickExportCSV)="exportCSV($event)"></save-energy-data>
+  </nb-tab>
+  <!-- 儲能系統 End -->
+
+  <!-- 箱體狀態 Start -->
+  <nb-tab i18n-tabTitle="@@holder" tabTitle="箱體狀態">
+    <holder-data *ngIf="polesData" [deviceType]="deviceType" [polesData]="polesData"
+      (clickExportCSV)="exportCSV($event)"></holder-data>
+  </nb-tab>
+  <!-- 箱體狀態 End -->
+</nb-tabset>

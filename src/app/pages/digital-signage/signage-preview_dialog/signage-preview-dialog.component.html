@@ -1,0 +1,101 @@
+<nb-card *ngIf="templateId === 'template_3' || templateId === 'template_4'" style="height: 90vh; width: 30vw">
+  <nb-card-body>
+
+    <!-- 直式兩層 Start -->
+
+    <div *ngIf="signage.id.startsWith('直式兩層_')" class="signageContainer">
+
+      <!-- main Start -->
+      <video i18n="@@explorerNotSupport" *ngIf="main_vdo_src" class="doubleBlock_vdo" autoplay
+        (loadedmetadata)="videoDomLoad($event, 'main')" (ended)="videoEnded('main', main_vdo_src)"
+        [src]="'/resource-center/' + main_vdo_src">
+        你的瀏覽器不支援此種檔案格式！
+      </video>
+      <img *ngIf="main_img_src" class="doubleBlock" [src]="'/resource-center/' + main_img_src" />
+      <div *ngIf="!main_vdo_src && !main_img_src" class="d-flex justify-content-center align-items-center doubleBlock">
+        <h2>{{this.message['main']}}</h2>
+      </div>
+      <!-- main End -->
+
+      <!-- main2 Start -->
+      <video i18n="@@explorerNotSupport" *ngIf="main2_vdo_src" class="doubleBlock_vdo" autoplay
+        (loadedmetadata)="videoDomLoad($event, 'main2')" (ended)="videoEnded('main2', main2_vdo_src)"
+        [src]="'/resource-center/' + main2_vdo_src">
+        你的瀏覽器不支援此種檔案格式！
+      </video>
+      <img *ngIf="main2_img_src" class="doubleBlock" [src]="'/resource-center/' + main2_img_src" />
+      <div *ngIf="!main2_vdo_src && !main2_img_src"
+        class="d-flex justify-content-center align-items-center doubleBlock">
+        <h2>{{this.message['main2']}}</h2>
+      </div>
+      <!-- main2 End -->
+    </div>
+
+    <!-- 直式兩層 End -->
+
+
+    <!-- 直式三層 Start -->
+
+    <div *ngIf="signage.id.startsWith('直式三層_')" class="signageContainer">
+      <!-- 跑馬燈 Start -->
+
+      <!-- Warning: deprecated -->
+      <marquee *ngIf="marquee_text" class="d-flex align-items-center" direction="left" scrollamount="5"
+        behavior="scroll" style="height: 10%; width: 100%; color: yellow">
+        <h1 style="margin: 0">{{ marquee_text }}</h1>
+      </marquee>
+      <!-- Warning: deprecated -->
+
+      <!-- 跑馬燈 End -->
+
+      <!-- main Start -->
+      <video i18n="@@explorerNotSupport" *ngIf="main_vdo_src" class="tripleBlock_vdo" autoplay
+        (loadedmetadata)="videoDomLoad($event, 'main')" (ended)="videoEnded('main', main_vdo_src)"
+        [src]="'/resource-center/' + main_vdo_src">
+        你的瀏覽器不支援此種檔案格式！
+      </video>
+      <img *ngIf="main_img_src" class="tripleBlock" [src]="'/resource-center/' + main_img_src" />
+      <div *ngIf="!main_vdo_src && !main_img_src" class="d-flex justify-content-center align-items-center tripleBlock">
+        <h2>{{this.message['main']}}</h2>
+      </div>
+      <!-- main End -->
+
+      <!-- main2 Start -->
+      <video i18n="@@explorerNotSupport" *ngIf="main2_vdo_src" class="tripleBlock_vdo" autoplay
+        (loadedmetadata)="videoDomLoad($event, 'main2')" (ended)="videoEnded('main2', main2_vdo_src)"
+        [src]="'/resource-center/' + main2_vdo_src">
+        你的瀏覽器不支援此種檔案格式！
+      </video>
+      <img *ngIf="main2_img_src" class="tripleBlock" [src]="'/resource-center/' + main2_img_src" />
+      <div *ngIf="!main2_vdo_src && !main2_img_src"
+        class="d-flex justify-content-center align-items-center tripleBlock">
+        <h2>{{this.message['main2']}}</h2>
+      </div>
+      <!-- main2 End -->
+    </div>
+
+    <!-- 直式三層 End -->
+
+    <!-- 直式全版 Start -->
+    <div *ngIf="signage.id.startsWith('直式全版_')" class="signageContainer">
+      <!-- main Start -->
+      <video i18n="@@explorerNotSupport" *ngIf="main_vdo_src" class="fullScreen_vdo" autoplay
+        (loadedmetadata)="videoDomLoad($event, 'main')" (ended)="videoEnded('main', main_vdo_src)"
+        [src]="'/resource-center/' + main_vdo_src">
+        你的瀏覽器不支援此種檔案格式！
+      </video>
+      <img *ngIf="main_img_src" class="fullScreen" [src]="'/resource-center/' + main_img_src" />
+      <div *ngIf="!main_vdo_src && !main_img_src" class="d-flex justify-content-center align-items-center fullScreen">
+        <h2>{{this.message['main']}}</h2>
+      </div>
+      <!-- main End -->
+    </div>
+    <!-- 全版 End -->
+  </nb-card-body>
+</nb-card>
+
+<nb-card *ngIf="templateId !== 'template_3' && templateId !== 'template_4'">
+  <nb-card-body>
+    <h1 i18n="@@templateError">選擇的版型異常！</h1>
+  </nb-card-body>
+</nb-card>

@@ -1,0 +1,99 @@
+<div class="col-12">
+  <!-- <img
+      src="{{ preview_image }}"
+      width="100%"
+      alt="預覽圖片"
+      style="margin-bottom: 10px"
+    /> -->
+
+  <div class="row m-0" style="width: 100%">
+    <div style="width: 95%">
+      <nb-tabset (changeTab)="changeTab($event)" fullWidth>
+        <!-- 智慧桿 Start -->
+        <nb-tab i18n-tabTitle="@@poleListTabTitle" tabTitle="桿體列表">
+          <ngx-pole-basic *ngIf="polesManageData" [polesManageData]="polesManageData" (onUpdated)="onUpdated($event)">
+          </ngx-pole-basic>
+        </nb-tab>
+        <!-- 智慧桿 End -->
+
+        <!-- 智慧照明 Start -->
+        <nb-tab i18n-tabTitle="@@smartLightTabTitle" tabTitle="智慧照明">
+          <ngx-smart-light *ngIf="polesData" [polesData]="polesData" (onUpdated)="onUpdated($event)"></ngx-smart-light>
+        </nb-tab>
+        <!-- 智慧照明 End -->
+
+        <!-- 環境感測 Start -->
+        <nb-tab i18n-tabTitle="@@environmentTabTitle" tabTitle="環境感測">
+          <ngx-env-sensor *ngIf="polesData" [polesData]="polesData"></ngx-env-sensor>
+        </nb-tab>
+        <!-- 環境感測 End -->
+
+        <!-- 儲能 Start -->
+        <nb-tab i18n-tabTitle="@@solarTabTitle" tabTitle="儲能系統">
+          <ngx-save-energy *ngIf="polesData" [polesData]="polesData"></ngx-save-energy>
+        </nb-tab>
+        <!-- 儲能 End -->
+
+        <!-- 箱體 Start -->
+        <nb-tab i18n-tabTitle="@@holderTabTitle" tabTitle="箱體狀態">
+          <ngx-holder *ngIf="polesData" [polesData]="polesData"></ngx-holder>
+        </nb-tab>
+        <!-- 箱體 End -->
+      </nb-tabset>
+    </div>
+    <div style="
+        width: 3%;
+        padding-top: 0.5%;
+        background-color: rgba(red, green, blue, alpha);
+      ">
+      <button nbButton ghost status="danger" (click)="readSetting(frequency)">
+        <nb-icon icon="settings-2-outline"></nb-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="col-12 d-flex justify-content-end p-0" style="margin-top: 2px">
+    <div i18n="@@poleAmount" *ngIf="polesData">共 {{ polesData.length }} 支</div>
+  </div>
+</div>
+
+<!-- dialog template Start -->
+<ng-template #frequency let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header class="p-1">
+      <div class="row">
+        <div i18n="@@globalSettings" class="col-6">全域設定</div>
+        <div class="col-6 d-flex justify-content-end">
+          <div class="col-9 d-flex justify-content-end">
+            <nb-icon icon="close-circle-outline" style="transform: scale(1.2); cursor: pointer;" (click)="ref.close()">
+            </nb-icon>
+          </div>
+        </div>
+      </div>
+    </nb-card-header>
+    <nb-card-body>
+      <div class="row align-items-center p-2">
+        <span i18n="@@updateFrequency">控制台更新頻率</span>
+        <nb-select matRipple [(selected)]="freScope" class="mx-4" style="width: 120px">
+          <nb-option matRipple *ngFor="let freScope of freScopes" [value]="freScope">{{ freScope }} <span
+              i18n="@@minute">分鐘</span></nb-option>
+        </nb-select>
+        <button nbButton i18n="@@confirmModify" status="primary" (click)="changeUpdateFrequency(ref, frequency)">
+          確認修改
+        </button>
+      </div>
+      <hr style="border: 1px solid #808080;">
+      <div class="row justify-content-between align-items-center p-2">
+        <span i18n="@@signageSchedule">看板排程</span>
+        <nb-select matRipple [(selected)]="toggleStatus" class="mx-4" style="width: 120px">
+          <nb-option matRipple *ngFor="let toggleStatus of (toggleTranslate | keyvalue)" [value]="toggleStatus.key">
+            {{toggleStatus.value }}</nb-option>
+        </nb-select>
+        <button nbButton i18n="@@confirmModify" status="primary" (click)="toggleSignageSchedule(ref, toggleStatus)">
+          確認修改
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</ng-template>
+<!-- dialog template End -->

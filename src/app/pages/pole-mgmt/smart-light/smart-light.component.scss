@@ -1,0 +1,27 @@
+:host ::ng-deep .ng2-smart-action-multiple-select {
+  text-align: center;
+}
+
+:host ::ng-deep .ng2-smart-action-multiple-select > input {
+  width: 25px;
+  height: 25px;
+  display: unset;
+}
+
+.area {
+  border: solid;
+  border-color: black;
+  border-width: 2px;
+}
+
+.text-color {
+  color: #de3e69;
+}
+
+nb-card {
+  overflow: auto;
+}
+
+:host ::ng-deep th {
+  min-width: 150px;
+}

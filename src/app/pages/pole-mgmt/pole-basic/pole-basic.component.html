@@ -1,0 +1,7 @@
+<nb-card>
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source" (create)="openDialog()" (edit)="openDialog($event.data)"
+      (delete)="deletePole($event.data)">
+    </ng2-smart-table>
+  </nb-card-body>
+</nb-card>

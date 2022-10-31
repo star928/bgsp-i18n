@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Signage</title>
+<!-- Favicons -->
+<!--<link rel="shortcut icon" href="#"/>-->
+<base href="../">  <!-- remove this at real server -->
+<script type="text/javascript" src="/js/url_parse.js"></script>
+
+<style type="text/css">
+* {
+  margin: 0;
+}
+
+body, html {
+  color: white;
+  background-color: #CBF5D1;
+  height: 100%;
+  margin:0;
+  padding:0;
+}
+
+.body > * {
+  padding: 0px;
+}
+
+#header {
+  position:fixed;
+  width:100%; height:10%;
+  top:0; right:0; bottom:10%; left:0;
+  background: #000000;
+  margin:0;
+  padding:0;
+}
+
+#main {
+  position:fixed;
+  width:100%; height:30% !important;
+  top:10% !important; right:0; bottom:40% !important; left:0;
+  background: #FFFFFF;
+  margin:0;
+  padding:0;
+}
+
+#main2 {
+  position:fixed;
+  width:100%; height:30% !important;
+  top:40% !important; right:0; bottom:70% !important; left:0;
+  background: #FFFFFF;
+  margin:0;
+  padding:0;
+}
+
+#main3 {
+  position:fixed;
+  width:100%; height:30%;
+  top:70%; right:0; bottom:100%; left:0;
+  background: #FFFFFF;
+  margin:0;
+  padding:0;
+}
+
+</style>
+
+<script src="/js/mqtt.min.js"></script>
+<script src="/js/jquery-3.4.1.min.js" ></script>
+<script type="text/javascript">
+
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+
+</script>
+</head>
+<body>
+  <div id="header">
+    <marquee id="marquee" direction="left" scrollamount="5" behavior="scroll" style="height: 100%;width: 100%;color: yellow;font-size: 4vh;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;">
+      <h1><span id="debug_info">.</span></h1>
+    </marquee>
+  </div>
+
+  <div id="main" style="display: flex;align-items: center;justify-content: center;">
+    <div style="text-align: center;">
+      <label id="label_car_number_title" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: black;">
+        車牌號碼
+      </label>
+      <label id="label_car_number" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: black;border-style:double;">
+      </label>
+    </div>
+  </div>
+
+  <div id="main2" style="display: flex;align-items: center;justify-content: center;">
+    <div style="text-align: center;">
+      <label id="label_parking_area_title" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: black;">
+        停車位號碼
+      </label>
+      <img src="/images/Parking_icon.svg.png" height="100%">
+      <label id="label_park_port_number" style="font-size: 32vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: red;">
+      </label>
+    </div>
+  </div>
+
+  <div id="main3" style="display: flex;align-items: center;justify-content: center;">
+    <div style="text-align: center;">
+      <label id="label_free_parking_area_num_title" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: black;">
+        剩餘車位數
+      </label>
+      <br>
+      <label id="label_free_parking_area_num" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: blue;">
+        120
+      </label>
+      <label id="label_free_parking_area_num" style="font-size: 18vw;font-family: 'Arial','LiHei Pro','黑體-繁','微軟正黑體', sans-serif !important;font-weight: bold;background-color: white;color: black;">
+        個
+      </label>
+    </div>
+  </div>
+
+<script type="text/javascript">
+
+var g_request = [];
+var play_mode = "center";
+var img_play_time = 5000;
+var g_url_domain;
+var g_url_display;
+var g_url_imgtime;
+var g_is_preview;
+
+function doUpdate(text)
+{
+  $("#label_car_number").html(text);
+}
+
+function doUpdateMain2(text)
+{
+  $("#label_park_port_number").html(text);
+}
+
+function doUpdateMain3(text)
+{
+  $("#label_free_parking_area_num").html(text);
+}
+
+function getNewText(source)
+{
+  var new_text = {};
+
+  if(play_mode == "center") {
+    new_text.id = g_url_display;
+  }
+  new_text.source = source;
+  new_text.text = "";
+
+  return new_text;
+}
+
+function doUpdateContainerMain()
+{
+  doQueryText("main");
+}
+
+function doUpdateContainerMain2()
+{
+  doQueryText("main2");
+}
+
+function doUpdateContainerMain3()
+{
+  doQueryText("main3");
+}
+
+function doQueryText(container)
+{
+  var cgi_url;
+  var new_file = getNewText(container);
+
+  //console.log("doQueryText");
+
+  if(play_mode == "center") {
+    cgi_url = '/cgi-center/display/' + g_url_domain;
+  } else {
+    cgi_url = '/cgi-device/display';
+  }
+
+  $.ajax({
+    method: 'POST',
+    url: cgi_url,
+    cache: false,
+    data: JSON.stringify(new_file),
+    contentType: 'application/json',
+    dataType: 'json',
+    beforeSend: function(xhr) {
+    },
+    success: function(json, textStatus, jqXHR) {
+      if(container == "main") {
+        if(json.text != "") {
+          doUpdate(json.text);
+        }
+      } else if(container == "main2") {
+        if(json.text != "") {
+          doUpdateMain2(json.text);
+        }
+      } else if(container == "main3") {
+        if(json.text !="") {
+          doUpdateMain3(json.text);
+        }
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      //console.log("doQueryText fail:" + jqXHR.status);
+    },
+    complete: function(result) {
+      if(container == "main") {
+        doUpdateContainerMain2();
+      } else if(container == "main2") {
+        doUpdateContainerMain3();
+      } else {
+        g_request.shift();
+        //console.log("all update is complete length=" + g_request.length);
+        if(g_request.length > 0) {
+          doUpdatePage();
+        }
+      }
+    }
+  });
+}
+
+function getNewMarquee(source)
+{
+  var new_marquee = {};
+
+  if(play_mode == "center") {
+    new_marquee.id = g_url_display;
+  }
+
+  new_marquee.source = source;
+  new_marquee.text = "";
+  return new_marquee;
+}
+
+function doQueryMarquee()
+{
+  $("#debug_info").html("請依指示停車");
+}
+
+function doUpdatePage()
+{
+  var jPaylod = g_request[0];
+
+  if(jPaylod.pause) {
+    var szEntryUrl = '/device/digital_signage/index.html' + '?domain=' + g_url_domain;
+
+    window.location.replace(szEntryUrl);
+  } else {
+    if(jPaylod.page != "template_car_number") {
+      var szImgTime = '&imgtime=' + (img_play_time/1000);
+      var szEntryUrl = '/device/digital_signage/ds/' + jPaylod.page + '.html' + '?domain=' + g_url_domain + szImgTime;
+
+      window.location.replace(szEntryUrl);
+    } else {
+      doUpdateContainerMain();
+    }
+  }
+}
+
+function doMqttChkChangePage()
+{
+  var host = window.location.host;
+  // wss is ok at https, but ws is not ok at https // the server must open wss
+  // var url = 'wss://' + host + '/mqtt';
+  // ws is ok at http, our project is run at local, so http is enough
+  var url = 'ws://' + host + '/mqtt';
+  let options = {
+    clean: true,
+    keepalive: 30,
+    //username: 'rw',
+    //password: 'readwrite',
+    //reconnectPeriod: 0,
+    //rejectUnauthorized: false
+  }
+  var client = mqtt.connect(
+    url,
+    options
+  );
+
+  /*
+  test command
+  mosquitto_pub -p 1886 -t 'apexx/control/mediaPlayer' -m '{"page":"template_1","interval":5, "pause":false}'
+  */
+  client.on('connect', () => {
+    //console.log('connected.');
+    client.subscribe('apexx/control/mediaPlayer')
+    client.on("message", function (topic, payload) {
+      //console.log([topic, payload].join(": "));
+      var jPaylod = JSON.parse(payload);
+
+      g_request.push(jPaylod);
+      //console.log("request length=" + g_request.length);
+      if (g_request.length == 1) {
+        doUpdatePage();
+      }
+    });
+  });
+}
+
+$(document).ready(function()
+{
+  var url = window.location.pathname;
+  var urlParams = new URLSearchParams(window.location.search);
+
+  if(window.location.pathname.includes("center")) {
+    //console.log("IN center");
+    play_mode = "center";
+  } else {
+    //console.log("Not IN center");
+    play_mode = "device";
+  }
+
+  g_url_domain = urlParams.get('domain');
+
+  if(play_mode == "center") {
+    g_url_display = urlParams.get('preview');
+  }
+
+  g_url_imgtime = urlParams.get('imgtime');
+  g_is_preview = urlParams.has('preview');
+
+  if(g_url_imgtime != null) {
+    var img_time_tmp = parseInt(g_url_imgtime , 10);
+    if((img_time_tmp > 0) && (img_time_tmp < 86400)) {
+      // sec ; max is 1 days
+      img_play_time = img_time_tmp * 1000;  // msec
+    }
+  }
+
+  doQueryMarquee();
+
+  if(window.location.pathname.includes("center")) {
+
+  } else {
+    doMqttChkChangePage();
+  }
+
+  var w = window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
+
+  var h = window.innerHeight
+  || document.documentElement.clientHeight
+  || document.body.clientHeight;
+
+  //1440,900
+  // 1366,768
+/*
+  console.log("window.inner",window.innerWidth,window.innerHeight);     //960,600
+  console.log("clientWidth",document.documentElement.clientWidth,document.documentElement.clientHeight); // 949,589
+  console.log("body.clientWidth",document.body.clientWidth,document.body.clientHeight);
+  console.log("w/h",w,h);
+  console.log("window.screen",window.screen.width,window.screen.height); // 1440,900
+  console.log("window.screen.avail",window.screen.availWidth,window.screen.availHeight);
+  console.log("document.body.client",document.body.clientWidth,document.body.clientHeight);
+  console.log("document.body.scroll",document.body.scrollWidth,document.body.scrollHeight);
+*/
+});
+
+$(window).on('resize', function(){
+  location.reload(); // reload at resize // maybe change full screen mode
+});
+
+</script>
+</body>
+</html>

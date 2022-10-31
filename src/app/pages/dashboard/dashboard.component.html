@@ -1,0 +1,65 @@
+<!-- main Start -->
+<div class="container-fluid">
+  <div class="row" style="width: 100%; height: 86vh">
+    <!-- left sidebar Start -->
+    <div class="left-sidebar" style="display: flex; flex-wrap: wrap">
+      <nb-card class="kpi-block">
+        <nb-card-header i18n="@@netconnectionRate"> 網路連線率 </nb-card-header>
+        <nb-card-body style="padding: 0.2vw">
+          <div echarts [options]="connectionOptions" class="chart_size"></div>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card class="kpi-block">
+        <nb-card-header i18n="@@deviceFailureRate"> 設備異常率 </nb-card-header>
+        <nb-card-body style="padding: 0.2vw">
+          <div echarts [options]="brokenOptions" class="chart_size"></div>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card class="kpi-block">
+        <nb-card-header i18n="@@AQI"> 即時空氣品質 </nb-card-header>
+        <nb-card-body style="padding: 1vw">
+          <div echarts [options]="airQualityOptions" class="chart_size"></div>
+        </nb-card-body>
+        <nb-card-footer *ngIf="airQualityAlarmList.length > 0" class="p-0">
+          <div style="color: #f9ab00;">{{ airQualityAlarmList.toString() }} - <span i18n="@@aqiWarning">濃度較高</span>
+          </div>
+        </nb-card-footer>
+      </nb-card>
+
+      <nb-card class="kpi-block">
+        <nb-card-header i18n="@@totalEnergy"> 照明當月總耗電量 </nb-card-header>
+        <nb-card-body class="d-flex align-items-center" style="font-size: 3vw">
+          <div style="width: 100%; color: #34a853">
+            {{ powerUsed / 1000 | number: "1.0-1" }} <span i18n="kiloWattPerHour @@kWh">度電</span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <!-- left sidebar End -->
+
+    <!-- leaflet -->
+    <div class="center-block">
+      <div leaflet [leafletOptions]="mapOptions" (leafletMapReady)="onMapReady($event)" class="d-flex"
+        style="height: 100%; width: 100%">
+        <!-- bottom alarm Start -->
+        <nb-card class="bottom-alarm align-self-end" style="
+            opacity: 0.8;
+            position: absolute;
+            border-radius: 0px;
+            overflow-y: scroll;
+          ">
+          <div class="d-flex justify-content-end" style="margin: 5px">
+            <nb-icon icon="external-link-outline" (click)="openAlarmDialog()" style="cursor: pointer"></nb-icon>
+          </div>
+          <ng2-smart-table [settings]="settings" [source]="source" class="table_size">
+          </ng2-smart-table>
+        </nb-card>
+        <!-- bottom alarm End -->
+      </div>
+    </div>
+    <!-- leaflet -->
+  </div>
+</div>
+<!-- main End -->

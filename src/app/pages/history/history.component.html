@@ -1,0 +1,18 @@
+<!-- <img src={{preview_image}} width="100%" alt="預覽圖片" style="margin-bottom: 10px;"> -->
+
+<nb-tabset (changeTab)="changeTab($event)">
+  <nb-tab i18n-tabTitle="@@eventLog" tabTitle="事件紀錄">
+    <ngx-event-log *ngIf="polesData" [polesData]="polesData" (clickExportPDF)="exportEventPDF($event)">
+    </ngx-event-log>
+  </nb-tab>
+
+  <nb-tab i18n-tabTitle="@@alarmLog" tabTitle="告警紀錄">
+    <ngx-alarm-log *ngIf="polesData" [polesData]="polesData" (clickExportPDF)="exportAlarmPDF($event)">
+    </ngx-alarm-log>
+  </nb-tab>
+
+  <nb-tab i18n-tabTitle="@@playerLog" tabTitle="播放檔案紀錄">
+    <ngx-player-log *ngIf="polesData" [polesData]="polesData" [type]="type" (clickExportPDF)="exportPDF($event)">
+    </ngx-player-log>
+  </nb-tab>
+</nb-tabset>

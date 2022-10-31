@@ -1,0 +1,160 @@
+<div class="col-12 p-0">
+  <!-- <img
+      src="{{ preview_image }}"
+      width="100%"
+      alt="一張圖片"
+      style="margin-bottom: 50px"
+    /> -->
+  <div class="row d-flex flex-wrap">
+    <div class="col-xxl-4 col-md-6">
+      <nb-card>
+        <nb-card-header i18n="@@modifyPassword">修改密碼</nb-card-header>
+
+        <nb-card-body>
+          <form (ngSubmit)="modifyUserPassword()" [formGroup]="user" aria-labelledby="title">
+            <div class="form-control-group">
+              <label i18n="@@password" class="label" for="input-passwd_hash">密碼</label>
+              <input nbInput fullWidth type="password" formControlName="passwd_hash"
+                i18n-placeholder="@@modifyPasswordHint" placeholder="請輸入欲修改的密碼" fieldSize="large" id="input-password"
+                name="password" [status]="
+                  user.controls.passwd_hash.dirty
+                    ? user.controls.passwd_hash.invalid
+                      ? 'danger'
+                      : 'success'
+                    : 'basic'
+                " [attr.aria-invalid]="
+                  user.controls.passwd_hash.invalid &&
+                  user.controls.passwd_hash.touched
+                    ? true
+                    : null
+                " autocomplete="off" />
+              <ng-container>
+                <p i18n="@@passwordRequired" class="caption status-danger" *ngIf="
+                    passwd_hash.hasError('required') && passwd_hash.touched
+                  ">
+                  密碼為<strong>必填</strong>欄位！
+                </p>
+                <p i18n="@@passwordLengthError" class="caption status-danger" *ngIf="
+                    passwd_hash.hasError('minlength') && passwd_hash.touched
+                  ">
+                  密碼最少為 {{ globalSettings.minLength }} 碼
+                </p>
+              </ng-container>
+            </div>
+            <div class="form-control-group">
+              <label i18n="@@enterPasswordAgain" class="label" for="input-email">再次輸入密碼</label>
+              <input nbInput fullWidth type="password" [formControl]="confirmPasswd"
+                i18n-placeholder="@@enterPasswordAgainHint" placeholder="請再次輸入密碼" fieldSize="large" [status]="
+                  confirmPasswd.dirty
+                    ? confirmPasswd.invalid
+                      ? 'danger'
+                      : 'success'
+                    : 'basic'
+                " [attr.aria-invalid]="
+                  confirmPasswd.invalid && confirmPasswd.touched ? true : null
+                " autocomplete="off" />
+              <ng-container>
+                <p i18n="@@passwordConfirmRequired" class="caption status-danger" *ngIf="
+                    confirmPasswd.hasError('required') && confirmPasswd.touched
+                  ">
+                  確認密碼為<strong>必填</strong>欄位！
+                </p>
+                <p i18n="@@passwordConfirmError" class="caption status-danger" *ngIf="
+                    confirmPasswd.value !== user.value.passwd_hash &&
+                    !confirmPasswd.hasError('required')
+                  ">
+                  請確認密碼一致
+                </p>
+              </ng-container>
+            </div>
+            <button nbButton fullWidth i18n="@@modifyPassword" status="primary" size="large" class="mt-4" [disabled]="
+                submitted ||
+                !user.valid ||
+                confirmPasswd.value !== user.value.passwd_hash
+              " [class.btn-pulse]="submitted">修改密碼</button>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-xxl-4 col-md-6" *ngIf="accessType === 'manager'">
+      <nb-card>
+        <nb-card-header i18n="@@modifyProfile">修改聯絡資料</nb-card-header>
+
+        <nb-card-body>
+          <form (ngSubmit)="modifyUserCommunication()" [formGroup]="communication" aria-labelledby="title">
+            <div class="form-control-group">
+              <label class="label" for="input-email">Email</label>
+              <input nbInput fullWidth type="email" formControlName="email" placeholder="Ex. pat@example.com"
+                fieldSize="large" [status]="
+                  communication.controls.email.dirty
+                    ? communication.controls.email.invalid
+                      ? 'danger'
+                      : 'success'
+                    : 'basic'
+                " [attr.aria-invalid]="
+                  communication.controls.email.invalid &&
+                  communication.controls.email.touched
+                    ? true
+                    : null
+                " autocomplete="off" />
+              <ng-container>
+                <p i18n="@@emailRequired" class="caption status-danger" *ngIf="
+                    communication.controls.email.hasError('required') &&
+                    communication.controls.email.touched
+                  ">
+                  Email為<strong>必填</strong>欄位！
+                </p>
+                <p i18n="@@emailError" class="caption status-danger" *ngIf="
+                    communication.controls.email.hasError('email') &&
+                    !communication.controls.email.hasError('required')
+                  ">
+                  請輸入正確格式的Email
+                </p>
+              </ng-container>
+            </div>
+            <div class="form-control-group">
+              <label i18n="@@phone" class="label" for="input-email">聯絡電話</label>
+              <input nbInput fullWidth formControlName="phone" placeholder="0912345678" fieldSize="large"
+                pattern="[0-9]*" [status]="
+                  communication.controls.phone.dirty
+                    ? communication.controls.phone.invalid
+                      ? 'danger'
+                      : 'success'
+                    : 'basic'
+                " [attr.aria-invalid]="
+                  communication.controls.phone.invalid &&
+                  communication.controls.phone.touched
+                    ? true
+                    : null
+                " autocomplete="off" />
+              <ng-container>
+                <p i18n="@@phoneRequired" class="caption status-danger" *ngIf="
+                    communication.controls.phone.hasError('required') &&
+                    communication.controls.phone.touched
+                  ">
+                  聯絡電話為<strong>必填</strong>欄位！
+                </p>
+                <p i18n="@@phoneError" class="caption status-danger" *ngIf="
+                    communication.controls.phone.hasError('pattern') &&
+                    !communication.controls.phone.hasError('required')
+                  ">
+                  請輸入正確格式的聯絡電話
+                </p>
+              </ng-container>
+            </div>
+            <button nbButton fullWidth i18n="@@modifyProfile" status="primary" size="large" class="mt-4"
+              [disabled]="submitted || !communication.valid" [class.btn-pulse]="submitted">修改聯絡資料</button>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <div class="col-12 d-flex justify-content-end">
+    <div style="margin-bottom: 10px">
+      <u><span i18n="@@platformVersion">平台版本</span> - {{GOLBAL_SETTINGS.platformVersion}}</u><br />
+      <u><span i18n="@@systemVersion">系統版本</span> - {{GOLBAL_SETTINGS.systemVersion}}</u>
+    </div>
+  </div>
+</div>

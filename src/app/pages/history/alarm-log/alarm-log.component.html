@@ -1,0 +1,38 @@
+<nb-card>
+  <nb-card-header>
+    <div class="d-flex flex-wrap">
+      <div class="p-1">
+        <nb-select matRipple [(selected)]="poleData" class="mx-2">
+          <nb-option matRipple *ngFor="let poleData of polesData" [value]="poleData">{{ poleData.number }}</nb-option>
+        </nb-select>
+      </div>
+      <div class="p-1">
+        <input nbInput class="ml-2" i18n-placeholder="@@selectStartDateHint" placeholder="請選擇起始日期"
+          [nbDatepicker]="startDate" autocomplete="off" />
+        <nb-date-timepicker #startDate singleColumn [step]="30"></nb-date-timepicker>
+        ~
+        <input nbInput class="ml-2" i18n-placeholder="@@selectEndDateHint" placeholder="請選擇結束日期"
+          [nbDatepicker]="endDate" autocomplete="off" />
+        <nb-date-timepicker #endDate singleColumn [step]="30"></nb-date-timepicker>
+      </div>
+      <div class="p-1">
+        <button nbButton i18n="@@queryRecord" class="ml-2" size="small" status="primary"
+          (click)="getPoleLogs(poleData, startDate, endDate)"
+          [disabled]="!startDate.visibleDate || !endDate.visibleDate" class="mx-2">
+          查詢紀錄
+        </button>
+      </div>
+      <div class="p-1">
+        <span *ngIf="alarmLogs">
+          <button nbButton i18n="@@exportPDF" class="ml-2" size="small" status="success" (click)="exportPDF()"
+            [disabled]="alarmLogs.length <= 0">
+            匯出檔案 ( PDF )
+          </button>
+        </span>
+      </div>
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <ng2-smart-table [settings]="settings" [source]="source"> </ng2-smart-table>
+  </nb-card-body>
+</nb-card>

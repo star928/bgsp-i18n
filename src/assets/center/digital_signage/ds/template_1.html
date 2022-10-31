@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Signage</title>
+
+<style type="text/css">
+* {
+  margin: 0;
+}
+
+body, html {
+  color: white;
+  background-color: #CBF5D1;
+  height: 100%;
+  margin:0;
+  padding:0;
+}
+
+.body > * {
+  padding: 0px;
+}
+
+#header {
+  position:fixed;
+  width:100%; height:12%;
+  top:0; right:0; bottom:auto; left:0;
+  background: #6BB7A4;
+}
+
+#main {
+  position:fixed;
+  width:100%; height : 83%;
+  top:12%; right : 0; bottom : 100px; left : 0;
+  background: #CBF5D1;
+}
+
+#footer {
+  position:fixed;
+  width:100%; height:5%;
+  top:auto; right:0; bottom:0; left:0;
+  background: #0081b4;
+}
+
+.mySlides img {
+  width:100%;
+  height:100%;
+}
+
+</style>
+
+<script src="/js/mqtt.min.js"></script>
+<script src="/js/jquery-3.4.1.min.js" ></script>
+<script type="text/javascript">
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+</script>
+</head>
+<body>
+
+  <div id="header">
+    <a class="weatherwidget-io" style="height: 100%;width: 100%;object-fit: contain;" href="https://forecast7.com/zh-tw/24d99121d30/taoyuan-city/" data-label_1="TAOYUAN" data-label_2="WEATHER" data-font="微軟正黑體 (Microsoft JhengHei)" data-theme="hexellence" >TAOYUAN WEATHER</a>
+  </div>
+  <div id="main">
+    <video autoplay id="video" style="height: 100%;width: 100%;">
+    </video>
+    <img id="image" src="images/bg_2741.jpg" alt="photo" style="height: 100%;width: 100%;">
+  </div>
+  <div id="footer">
+  <!--
+    <marquee id="marquee" direction="left" scrollamount="5" behavior="scroll" style="height: 100%;width: 100%;object-fit: contain;">
+      <h1><span id="debug_info">.</span></h1>
+    </marquee>
+  -->
+  </div>
+
+<script type="text/javascript">
+var  WEATHER_WIDGET_HEIGHT = 92;
+var screen_h = 1440;
+var first_time = 1;
+var play_mode = "center";
+var img_play_time = 5000;
+var current_media = {"media_type":"img","src":"first"};
+var g_url_domain;
+var g_url_display;
+var g_url_imgtime;
+
+function doUpdate(file_info)
+{
+  var filename = file_info.file;
+  var file_type =  filename.substr(filename.length - 3);
+
+  file_type = file_type.toLowerCase();
+  if((file_type == "jpg") ||
+     (file_type == "png") ||
+     (file_type == "gif") ||
+     (file_type == "bmp")) {
+    current_media.media_type = "img";
+  } else {
+    current_media.media_type = "vdo";
+  }
+
+  current_media.src = file_info.file;
+
+  window.sessionStorage['MainMediaType'] = current_media.media_type;
+  window.sessionStorage['MainMediaSrc'] = current_media.src;
+
+  play_next_media();
+}
+
+function getNewFile(source)
+{
+  var new_file = {};
+
+  if(play_mode == "center") {
+    new_file.id = g_url_display;
+  }
+  new_file.source = source;
+  new_file.file = current_media.src;
+
+  return new_file;
+}
+
+function doUpdateContainerMain()
+{
+  doQueryFile("main");
+}
+
+function doQueryFile(container)
+{
+  var cgi_url;
+  var new_file = getNewFile(container);
+
+  if(play_mode == "center") {
+    cgi_url = '/cgi-center/display/' + g_url_domain;
+  } else {
+    cgi_url = '/cgi-device/display';
+  }
+
+  $.ajax({
+    method: 'POST',
+    url: cgi_url,
+    cache: false,
+    data: JSON.stringify(new_file),
+    contentType: 'application/json',
+    dataType: 'json',
+    beforeSend: function(xhr) {
+    },
+    success: function(json, textStatus, jqXHR) {
+      doUpdate(json);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.log("doQueryFile fail:" + jqXHR.status);
+    },
+    complete: function(result) {
+      if(first_time) {
+        first_time = 0;
+        doQueryMarquee();
+      }
+    }
+  });
+}
+
+function getNewMarquee(source)
+{
+  var new_marquee = {};
+
+  if(play_mode == "center") {
+    new_marquee.id = g_url_display;
+  }
+
+  new_marquee.source = source;
+  new_marquee.text = "";
+
+  return new_marquee;
+}
+
+function doQueryMarquee()
+{
+  var cgi_url;
+  var new_marquee = getNewMarquee("marqueetext");
+
+  if(play_mode == "center") {
+    cgi_url = '/cgi-center/display/' + g_url_domain;
+  } else {
+    cgi_url = '/cgi-device/display';
+  }
+
+  $.ajax({
+    method: 'POST',
+    url: cgi_url,
+    cache: false,
+    data: JSON.stringify(new_marquee),
+    contentType: 'application/json',
+    dataType: 'json',
+    beforeSend: function(xhr) {
+    },
+    success: function(json, textStatus, jqXHR) {
+      if(json && json.text != "") {
+        var marquee = '<marquee direction="left" scrollamount="5" behavior="scroll" style="height: 100%;width: 100%;object-fit: contain;">' +
+                      '<h1><span>' +
+                       json.text +
+                       '</span></h1>' +
+                       '</marquee>';
+        var header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+        var main_height_percent = 100 - header_height_percent - 5;
+
+        $("#header").css("height", header_height_percent + "%");
+        $("#main").css("top", header_height_percent + "%");
+        $("#main").css("height", main_height_percent + "%");
+        $("#footer").html(marquee);
+        $("#footer").css("display","block");
+      } else {
+        var marquee = '<marquee><h1><span>.</span></h1></marquee>';
+        var header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+        var main_height_percent = 100 - header_height_percent;
+
+        $("#header").css("height", header_height_percent + "%");
+        $("#main").css("top", header_height_percent + "%");
+        $("#main").css("height", main_height_percent + "%");
+        $("#footer").html(marquee);
+        $("#footer").css("display","none");
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      // disable marquee
+      var marquee = '<marquee><h1><span>.</span></h1></marquee>';
+      var header_height_percent = (WEATHER_WIDGET_HEIGHT * 100) / screen_h;
+
+      console.log("doQueryMarquee fail:" + jqXHR.status);
+      $("#header").css("height", header_height_percent + "%");
+      $("#main").css("top", header_height_percent + "%");
+      var main_height_percent = 100 - header_height_percent;
+      $("#main").css("height", main_height_percent + "%");
+      $("#footer").html(marquee);
+      $("#footer").css("display","none");
+    },
+    complete: function(result) {
+
+    }
+  });
+}
+
+function dochkChangePage(page_info)
+{
+  if(page_info.pause) {
+    var szEntryUrl = '/device/digital_signage/index.html' + '?domain=' + g_url_domain;
+
+    window.location.replace(szEntryUrl);
+  } else {
+    if(page_info.page != "template_1") {
+      var szImgTime = '&imgtime=' + (img_play_time/1000);
+      var szEntryUrl = '/device/digital_signage/ds/' +
+                       page_info.page + '.html' +
+                       '?domain=' + g_url_domain + szImgTime;
+
+      window.location.replace(szEntryUrl);
+    } else {
+      if(current_media.media_type == "img") {
+        if(vTimer != null) {
+          clearTimeout(vTimer);
+          vTimer = null;
+        }
+      } else if(current_media.media_type == "vdo") {
+        vobj.pause();
+        vobj.currentTime = 0;
+      }
+      // set to reload page 1 time
+      first_time = 1;
+      doUpdateContainerMain();
+    }
+  }
+}
+
+var iobj = document.getElementById('image');
+var vobj = document.getElementById('video');
+var vTimer = null;
+
+function play_next_media()
+{
+  if(current_media.media_type == "img") {
+    iobj = document.getElementById('image');
+    if(play_mode == "center") {
+      iobj.src = location.origin + '/resource-center/' + current_media.src;
+    } else {
+      iobj.src = location.origin + '/resource-device/' + current_media.src;
+    }
+
+    if(iobj.style.display != "block") {
+      iobj.style.display = "block";
+    }
+
+    if(vobj.style.display != "none") {
+      vobj.style.display = "none";
+    }
+
+    vTimer = setTimeout(doUpdateContainerMain , img_play_time);
+  } else if(current_media.media_type == "vdo") {
+    clearTimeout(vTimer);
+    if(play_mode == "center") {
+      vobj.src = location.origin + '/resource-center/' + current_media.src;
+    } else {
+      vobj.src = location.origin + '/resource-device/' + current_media.src;
+    }
+
+    vobj.load();
+
+    vobj.style.display = "block";
+    iobj.style.display = "none";
+  }
+}
+
+vobj.addEventListener('ended', function() {
+  doUpdateContainerMain();
+});
+
+function doMqttChkChangePage()
+{
+  var host = window.location.host;
+  // wss is ok at https, but ws is not ok at https // the server must open wss
+  // var url = 'wss://' + host + '/mqtt';
+  // ws is ok at http, our project is run at local , so http is enough .
+  var url = 'ws://' + host + '/mqtt';
+
+  let options = {
+    clean: true,
+    keepalive: 30,
+    //username: 'rw',
+    //password: 'readwrite',
+    //reconnectPeriod: 0,
+    //rejectUnauthorized: false
+  }
+  var client = mqtt.connect(
+    url,
+    options
+  );
+
+  /*
+  test command
+  mosquitto_pub -p 1886 -t 'apexx/control/mediaPlayer' -m '{"page":"template_1","interval":5, "pause":false}'
+  */
+  client.on('connect', function() {
+    client.subscribe('apexx/control/mediaPlayer');
+  });
+
+  client.on('message', function (topic, payload) {
+    //console.log([topic, payload].join(": "));
+    var jPaylod = JSON.parse(payload);
+
+    dochkChangePage(jPaylod);
+  });
+}
+
+$(document).ready(function() {
+  var urlParams = new URLSearchParams(window.location.search);
+
+  if(window.location.pathname.includes("center")) {
+    play_mode = "center";
+  } else {
+    play_mode = "device";
+  }
+
+  if((window.sessionStorage['MainMediaType'] != undefined) &&
+     (window.sessionStorage['MainMediaSrc'] != undefined)) {
+    current_media.media_type = window.sessionStorage['MainMediaType'];
+    current_media.src = window.sessionStorage['MainMediaSrc'];
+  }
+
+  g_url_domain = urlParams.get('domain');
+
+  if(play_mode == "center") {
+    g_url_display = urlParams.get('preview');
+  }
+
+  g_url_imgtime = urlParams.get('imgtime');
+
+  if(g_url_imgtime != null) {
+    var img_time_tmp = parseInt(g_url_imgtime , 10);
+    if((img_time_tmp > 0) && (img_time_tmp < 86400)) {
+      // sec ; max is 1 days
+      img_play_time = img_time_tmp * 1000;  // msec
+    }
+  }
+
+  if(window.location.pathname.includes("center")) {
+    doUpdateContainerMain();
+  } else {
+    doMqttChkChangePage();
+  }
+
+  var w = window.innerWidth
+  || document.documentElement.clientWidth
+  || document.body.clientWidth;
+
+  var h = window.innerHeight
+  || document.documentElement.clientHeight
+  || document.body.clientHeight;
+
+  screen_h = h;
+});
+
+$(window).on('resize', function(){
+  location.reload();
+});
+
+</script>
+
+</body>
+</html>

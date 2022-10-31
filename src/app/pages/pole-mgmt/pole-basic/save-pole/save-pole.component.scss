@@ -1,0 +1,48 @@
+.subtitle {
+  color: #de3e69;
+  font-size: medium;
+}
+
+:host ::ng-deep th.ng2-smart-th.wday.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-th.start.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-th.end.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-th.display.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep th.ng2-smart-actions.ng-star-inserted {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+:host ::ng-deep td.ng-star-inserted {
+  padding: 0.2rem;
+  text-align: center;
+}
+
+:host ::ng-deep nav.ng2-smart-pagination-nav.ng-star-inserted {
+  margin: 0rem;
+  margin-top: 0.5rem;
+}
+
+input {
+  padding: 0rem;
+}
+
+.required {
+  color: #ff3d71;
+  margin-left: 0.5rem;
+}
