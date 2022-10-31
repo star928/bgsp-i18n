@@ -1,18 +1,12 @@
 [[redirects]]
-  from = "/en-US/cgi-center/*"
+  from = "/cgi-center/*"
   to = "https://smartpole.baogao-ipark.ntpc.gov.tw/cgi-center/:splat"
   status = 200
   force = true # COMMENT: ensure that we always redirect
   # headers = {X-From = "Netlify"}
 
 [[redirects]]
-  from = "/en-US/resource-center/*"
+  from = "/resource-center/*"
   to = "https://smartpole.baogao-ipark.ntpc.gov.tw/resource-center/:splat"
-  status = 200
-  force = true # COMMENT: ensure that we always redirect
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
   status = 200
   force = true # COMMENT: ensure that we always redirect
