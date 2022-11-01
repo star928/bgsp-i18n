@@ -1,3 +1,10 @@
+[build]
+  command = "ng build"
+  publish = "dist/bgsp-ui/en-US/"
+
+[context.production]
+  command = "ng build --prod"
+
 [[redirects]]
   from = "/en-US/cgi-center/*"
   to = "https://smartpole.baogao-ipark.ntpc.gov.tw/cgi-center/:splat"
